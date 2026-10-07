@@ -1,0 +1,6 @@
+{
+  "name": "Catálogo de Revistas de Viajes",
+  "description": "Catálogo histórico y buscador especializado de artículos en revistas de viajes por localidad, país y región.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
