@@ -2,9 +2,9 @@
 
 import { PostgresArticleRepository } from '@/src/modules/travel-catalog/infrastructure/PostgresArticleRepository.ts';
 import {
-  SearchArticlesByLocationUseCase,
+  SearchArticlesByTopicUseCase,
   SearchArticlesResponse,
-} from '@/src/modules/travel-catalog/application/SearchArticlesByLocationUseCase.ts';
+} from '@/src/modules/travel-catalog/application/SearchArticlesByTopicUseCase.ts';
 import {
   GetCatalogOverviewUseCase,
   CatalogOverviewResponse,
@@ -12,7 +12,7 @@ import {
 import { ArticleDTO } from '@/src/modules/travel-catalog/domain/Article.ts';
 
 /**
- * Composition Root for Travel Catalog Domain
+ * Composition Root for Magazine Catalog Domain
  *
  * Assembles the infrastructure layer (PostgreSQL / Cloud SQL) and application use cases
  * to expose server actions directly to presentation components.
@@ -20,7 +20,7 @@ import { ArticleDTO } from '@/src/modules/travel-catalog/domain/Article.ts';
 
 // Singleton instances for Server Actions composition
 const postgresArticleRepository = new PostgresArticleRepository();
-const searchArticlesUseCase = new SearchArticlesByLocationUseCase(postgresArticleRepository);
+const searchArticlesUseCase = new SearchArticlesByTopicUseCase(postgresArticleRepository);
 const catalogOverviewUseCase = new GetCatalogOverviewUseCase(postgresArticleRepository);
 
 export interface SearchActionParams {
@@ -30,7 +30,7 @@ export interface SearchActionParams {
 }
 
 /**
- * Server Action: Search articles by location (city, region, country, or keyword)
+ * Server Action: Search articles by topic (theme, subject, category, or keyword)
  */
 export async function searchArticlesAction(
   params: SearchActionParams
@@ -49,14 +49,14 @@ export async function searchArticlesAction(
       query: params.query,
       articles: [],
       total: 0,
-      matchedLocations: [],
+      matchedTopics: [],
       isEmpty: true,
     };
   }
 }
 
 /**
- * Server Action: Load initial catalog overview (magazines list, featured articles, popular destinations)
+ * Server Action: Load initial catalog overview (magazines list, featured articles, popular topics)
  */
 export async function getCatalogOverviewAction(): Promise<CatalogOverviewResponse> {
   try {
@@ -66,7 +66,7 @@ export async function getCatalogOverviewAction(): Promise<CatalogOverviewRespons
     return {
       magazines: [],
       featuredArticles: [],
-      popularDestinations: [],
+      popularTopics: [],
     };
   }
 }

@@ -1,5 +1,5 @@
 import { Article } from '../domain/Article.ts';
-import { Location } from '../domain/Location.ts';
+import { Topic } from '../domain/Topic.ts';
 import { MagazineIssue } from '../domain/MagazineIssue.ts';
 
 export interface RawDatabaseArticleJoined {
@@ -48,11 +48,11 @@ export class ArticleMapper {
    * Maps a relational database row with joins into a domain Article Aggregate Root.
    */
   public static toDomain(raw: RawDatabaseArticleJoined): Article {
-    // 1. Build Location Value Object
-    const location = Location.create({
-      city: raw.article.city,
-      region: raw.article.region,
-      country: raw.article.country,
+    // 1. Build Topic Value Object
+    const topic = Topic.create({
+      name: raw.article.city || raw.article.country,
+      subtopic: raw.article.region,
+      category: raw.article.country,
     });
 
     // 2. Build MagazineIssue Domain Entity
@@ -82,7 +82,7 @@ export class ArticleMapper {
       photographer: raw.article.photographer,
       startPage: raw.article.startPage,
       endPage: raw.article.endPage,
-      location,
+      topic,
       issue,
       synopsis: raw.article.synopsis,
       tags: tagsArray,

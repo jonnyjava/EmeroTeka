@@ -4,23 +4,23 @@ import { ArticleDTO } from '../domain/Article.ts';
 export interface CatalogOverviewResponse {
   magazines: MagazineSummary[];
   featuredArticles: ArticleDTO[];
-  popularDestinations: string[];
+  popularTopics: string[];
 }
 
 export class GetCatalogOverviewUseCase {
   constructor(private readonly articleRepository: IArticleRepository) {}
 
   public async execute(): Promise<CatalogOverviewResponse> {
-    const [magazines, featuredArticlesEntities, locations] = await Promise.all([
+    const [magazines, featuredArticlesEntities, topics] = await Promise.all([
       this.articleRepository.getMagazines(),
       this.articleRepository.findFeatured(8),
-      this.articleRepository.getPopularLocations(),
+      this.articleRepository.getPopularTopics(),
     ]);
 
     return {
       magazines,
       featuredArticles: featuredArticlesEntities.map(article => article.toDTO()),
-      popularDestinations: locations.map(loc => loc.toFormattedString()),
+      popularTopics: topics.map(top => top.toFormattedString()),
     };
   }
 }

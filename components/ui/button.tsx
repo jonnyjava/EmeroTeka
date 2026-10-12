@@ -8,19 +8,23 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-stone-900 text-stone-50 shadow-xs hover:bg-stone-850",
+          "bg-[#2A3E92] text-white shadow-xs hover:bg-[#1E2D69]",
         destructive:
           "bg-red-600 text-white shadow-xs hover:bg-red-500",
         outline:
-          "border border-stone-200 bg-white shadow-2xs hover:bg-stone-100 hover:text-stone-900",
+          "border-2 border-[#DCE2EE] bg-white text-[#1B275E] shadow-2xs hover:bg-[#EEF2FF] hover:border-[#2A3E92] hover:text-[#2A3E92]",
         secondary:
-          "bg-stone-100 text-stone-900 shadow-2xs hover:bg-stone-200",
-        ghost: "hover:bg-stone-100 hover:text-stone-900",
-        link: "text-stone-900 underline-offset-4 hover:underline",
+          "bg-[#EEF2FF] text-[#2A3E92] border border-[#CCD5EE] shadow-2xs hover:bg-[#E0E7FF]",
+        ghost: "hover:bg-[#EEF2FF] hover:text-[#2A3E92]",
+        link: "text-[#2A3E92] underline-offset-4 hover:underline",
         voyage:
-          "bg-[#0F2027] text-[#FAF8F5] hover:bg-[#1A3644] border border-[#203A43]/50 shadow-sm",
+          "bg-[#2A3E92] text-white hover:bg-[#1E2D69] border border-[#1B275E]/80 shadow-sm",
+        stTropaz:
+          "bg-[#2A3E92] text-white hover:bg-[#1E2D69] active:bg-[#141E46] shadow-sm",
+        lpGold:
+          "bg-[#FFC72C] text-[#1B275E] hover:bg-[#E5B327] font-bold shadow-xs",
         sand:
-          "bg-[#F5EBE0] text-[#4A3B32] hover:bg-[#EBDDCF] border border-[#E3D5CA]",
+          "bg-[#F8F9FC] text-[#1B275E] hover:bg-[#EEF2FF] border border-[#CCD5EE]",
       },
       size: {
         default: "h-9 px-4 py-2",

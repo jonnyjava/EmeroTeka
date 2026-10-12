@@ -10,17 +10,19 @@ import { ArchitectureInfoModal } from './ArchitectureInfoModal.tsx';
 import { ArticleDTO } from '../domain/Article.ts';
 import { MagazineSummary } from '../domain/IArticleRepository.ts';
 import { searchArticlesAction } from '@/app/actions/search.ts';
-import { Compass, BookOpen, Layers, Search, Sparkles } from 'lucide-react';
+import { Compass, BookOpen, Layers, Search, Sparkles, MapPin, Bookmark } from 'lucide-react';
 
 interface TravelCatalogAppProps {
   initialMagazines: MagazineSummary[];
   initialArticles: ArticleDTO[];
-  initialDestinations: string[];
+  initialTopics?: string[];
+  initialDestinations?: string[];
 }
 
 export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
   initialMagazines,
   initialArticles,
+  initialTopics,
   initialDestinations,
 }) => {
   const [query, setQuery] = useState('');
@@ -72,49 +74,61 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF6F0] text-[#0F2027] flex flex-col font-sans selection:bg-[#0F2027] selection:text-white">
-      {/* Top Bar Header */}
+    <div className="min-h-screen bg-[#F7F9FC] text-[#1B275E] flex flex-col font-sans selection:bg-[#2A3E92] selection:text-white">
+      {/* Top Bar Header in Lonely Planet St Tropaz palette */}
       <CatalogHeader
         onSearchFocus={handleFocusSearch}
         onOpenArchitecture={() => setIsArchitectureOpen(true)}
         totalArticles={articles.length}
       />
 
-      {/* Hero Marquee Section (Deep Blue & Warm Sand Palette) */}
-      <section className="relative border-b border-[#E6CCB2] overflow-hidden bg-gradient-to-b from-[#FAF6F0] via-[#F5EBE0]/80 to-[#FAF6F0] pt-14 pb-18 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-white border border-[#E6CCB2] rounded-full text-xs font-mono text-[#0F2027] tracking-wide shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-[#1E3A8A] inline-block animate-pulse" />
-            <span>Persistencia en PostgreSQL Cloud SQL · Domain-Driven Design (DDD)</span>
+      {/* Hero Marquee Section (Pre-2022 Lonely Planet Guidebook & Magazine Aesthetic) */}
+      <section className="relative border-b-2 border-[#DCE2EE] bg-white overflow-hidden pt-12 pb-16 px-4 sm:px-6 lg:px-8">
+        {/* Lonely Planet Spine Tab Decoration (Left Vertical Accent) */}
+        <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-3 bg-[#2A3E92]" />
+
+        {/* Subtle Travel Grid Pattern */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#2A3E92_1px,transparent_1px)] [background-size:16px_16px]" />
+
+        <div className="max-w-5xl mx-auto text-center space-y-4 relative z-10">
+          {/* Top Spine Ribbon / Metadata Pill */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[#EEF2FF] border border-[#CCD5EE] rounded-md text-xs font-mono text-[#2A3E92] font-bold tracking-wider uppercase shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-[#FFC72C] inline-block ring-2 ring-[#2A3E92]" />
+            <span>Tipografía National Geographic (Geograph & Caslon) · Paleta St Tropaz</span>
+            <span className="hidden sm:inline text-slate-400">·</span>
+            <span className="hidden sm:inline text-[#1B275E] font-normal">Hemeroteca Histórica</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-[#0F2027] leading-[1.12] text-balance">
-            Catálogo Histórico de Revistas de Viajes
+          {/* Main Title in Authoritative Editorial Serif with St Tropaz Blue tone */}
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-[#1B275E] leading-[1.12] text-balance">
+            Catálogo Histórico de Artículos de Viajes
           </h1>
 
-          <p className="text-base sm:text-lg text-[#4A5568] max-w-2xl mx-auto leading-relaxed">
-            Localiza con exactitud en qué revista, año, número y páginas se han publicado crónicas y reportajes sobre cualquier ciudad o paraje del mundo.
+          <p className="text-base sm:text-lg text-[#475569] max-w-2xl mx-auto leading-relaxed">
+            Descubre con precisión milimétrica en qué revista, año, número y páginas se publicaron crónicas, mapas y reportajes de autor sobre cualquier temática o rincón del planeta.
           </p>
 
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-3 text-xs font-mono text-[#203A43]">
-            <span className="bg-[#FAF6F0] px-2.5 py-1 rounded-md border border-[#E6CCB2]">
-              6 revistas de referencia
-            </span>
-            <span>·</span>
-            <span className="bg-[#FAF6F0] px-2.5 py-1 rounded-md border border-[#E6CCB2]">
-              23 números indexados
-            </span>
-            <span>·</span>
-            <span className="bg-[#FAF6F0] px-2.5 py-1 rounded-md border border-[#E6CCB2]">
-              Localidades con índices y páginas exactas
-            </span>
+          {/* Guidebook Stats Strip (Pre-2022 LP Chapter Index Style) */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5 text-xs font-mono">
+            <div className="bg-[#F8F9FC] px-3 py-1.5 rounded-lg border border-[#CCD5EE] text-[#1B275E] font-semibold flex items-center gap-1.5 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#2A3E92]" />
+              <span>6 revistas internacionales</span>
+            </div>
+            <div className="bg-[#F8F9FC] px-3 py-1.5 rounded-lg border border-[#CCD5EE] text-[#1B275E] font-semibold flex items-center gap-1.5 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#0098B8]" />
+              <span>23 volúmenes indexados</span>
+            </div>
+            <div className="bg-[#F8F9FC] px-3 py-1.5 rounded-lg border border-[#CCD5EE] text-[#1B275E] font-semibold flex items-center gap-1.5 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#FFC72C]" />
+              <span>Citas y páginas exactas</span>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Main Workspace Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
-        {/* 1) Predictive Location Search Bar with Modern Travel Icons */}
+        {/* 1) Predictive Search Bar (St Tropaz #2A3E92 & Lonely Planet Chapter Card) */}
         <PredictiveLocationSearchBar
           query={query}
           onQueryChange={setQuery}
@@ -123,7 +137,7 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
           selectedYear={selectedYear}
           onYearChange={setSelectedYear}
           magazines={initialMagazines}
-          popularDestinations={initialDestinations}
+          popularTopics={initialTopics || initialDestinations}
           totalResults={articles.length}
           isLoading={isSearching}
           onReset={handleResetFilters}
@@ -132,19 +146,20 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
 
         {/* Results Stream Section */}
         <section aria-labelledby="resultados-titulo" className="space-y-6">
-          <div className="flex items-center justify-between pb-3.5 border-b border-[#E6CCB2]/80">
+          <div className="flex items-center justify-between pb-3.5 border-b-2 border-[#DCE2EE]">
             <div className="flex items-center gap-2.5">
-              <h3 id="resultados-titulo" className="font-serif text-xl sm:text-2xl font-bold text-[#0F2027]">
-                {query ? `Artículos para "${query}"` : 'Artículos Indexados en el Archivo'}
+              <div className="w-1.5 h-6 bg-[#2A3E92] rounded-full hidden sm:block" />
+              <h3 id="resultados-titulo" className="font-serif text-xl sm:text-2xl font-bold text-[#1B275E]">
+                {query ? `Artículos para "${query}"` : 'Artículos Indexados en la Colección'}
               </h3>
-              <span className="font-mono text-xs text-[#0F2027] font-semibold bg-[#EBDDCF] px-2.5 py-0.5 rounded-full tabular-nums">
+              <span className="font-mono text-xs text-[#2A3E92] font-bold bg-[#EEF2FF] border border-[#CCD5EE] px-2.5 py-0.5 rounded-md tabular-nums">
                 {articles.length} {articles.length === 1 ? 'resultado' : 'resultados'}
               </span>
             </div>
 
             {(query || selectedMagazineId || selectedYear) && (
-              <span className="text-xs text-[#4A5568] hidden sm:inline font-medium">
-                Filtros:{' '}
+              <span className="text-xs text-[#475569] hidden sm:inline font-medium">
+                Filtros activos:{' '}
                 {[
                   query && `"${query}"`,
                   selectedMagazineId && initialMagazines.find((m) => m.id === selectedMagazineId)?.name,
@@ -156,7 +171,7 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
             )}
           </div>
 
-          {/* 2) Responsive Article Cards Grid */}
+          {/* 2) Responsive Article Cards Grid with St Tropaz Simulated Covers */}
           <ResponsiveArticleGrid
             articles={articles}
             onSelectArticle={setSelectedArticle}
@@ -186,25 +201,28 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
         onClose={() => setIsArchitectureOpen(false)}
       />
 
-      {/* Editorial Footer */}
-      <footer className="mt-20 border-t border-[#E6CCB2] bg-white py-8 px-4 sm:px-6 lg:px-8 text-xs text-[#4A5568] font-mono">
+      {/* Editorial Footer (Lonely Planet Guide Colophon Style) */}
+      <footer className="mt-20 border-t-2 border-[#DCE2EE] bg-white py-8 px-4 sm:px-6 lg:px-8 text-xs text-[#475569] font-mono">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <span className="font-semibold text-[#0F2027]">
-              Archivia Viaggi
-            </span>{' '}
-            · Catálogo Bibliográfico de Revistas de Viajes
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 bg-[#2A3E92] rounded-xs inline-block" />
+            <span className="font-bold text-[#1B275E]">Archivia Viaggi</span>
+            <span>·</span>
+            <span>Catálogo Bibliográfico de Revistas de Viajes</span>
+            <span className="hidden md:inline bg-[#EEF2FF] text-[#2A3E92] font-semibold px-2 py-0.5 rounded border border-[#CCD5EE] text-[10px]">
+              Tipografía NatGeo (Geograph & Caslon) · St Tropaz #2A3E92
+            </span>
           </div>
 
           <div className="flex items-center gap-6">
             <button
               type="button"
               onClick={() => setIsArchitectureOpen(true)}
-              className="text-[#0F2027] hover:text-[#1E3A8A] underline transition-colors cursor-pointer"
+              className="text-[#2A3E92] hover:text-[#1E2D69] font-bold underline transition-colors cursor-pointer"
             >
               Arquitectura DDD & Capas
             </button>
-            <span className="text-[#203A43]">PostgreSQL en Google Cloud SQL</span>
+            <span className="text-[#1B275E] font-medium">PostgreSQL en Google Cloud SQL</span>
           </div>
         </div>
       </footer>

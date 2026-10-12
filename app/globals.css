@@ -1,1 +1,69 @@
 @import "tailwindcss";
+
+/* National Geographic Typography Palette Webfonts:
+   - Plus Jakarta Sans: Closest equivalent to 'Geograph' (Kris Sowersby / Klim Type Foundry, the official geometric grotesque brand font)
+   - Libre Caslon Text: Historic National Geographic editorial serif (NatGeo Caslon / Grosvenor / Tiempos)
+   - Cinzel: Classical Roman inscriptional serif equivalent to 'NatGeo SemiBold' iconic cover masthead
+   - Bitter: Contemporary slab serif equivalent to 'Earle' (Tal Leming, Sylvia Earle tribute typeface)
+*/
+@import url('https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Cinzel:wght@600;700;800;900&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+@theme {
+  /* Font Family Overrides */
+  --font-sans: var(--font-sans), 'Plus Jakarta Sans', 'Geograph', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: var(--font-serif), 'Libre Caslon Text', 'Caslon', 'Minion Pro', Georgia, serif;
+  --font-display: var(--font-display), 'Cinzel', 'NatGeo SemiBold', 'Libre Caslon Display', 'Times New Roman', serif;
+  --font-slab: var(--font-slab), 'Bitter', 'Earle', 'Rockwell', serif;
+
+  /* National Geographic Named Utility Tokens */
+  --font-natgeo-sans: var(--font-sans), 'Plus Jakarta Sans', 'Geograph', sans-serif;
+  --font-natgeo-serif: var(--font-serif), 'Libre Caslon Text', 'Caslon', serif;
+  --font-natgeo-display: var(--font-display), 'Cinzel', 'NatGeo SemiBold', serif;
+  --font-natgeo-slab: var(--font-slab), 'Bitter', 'Earle', serif;
+
+  /* Color Palette (St Tropaz #2A3E92 and Lonely Planet pre-2022 heritage) */
+  --color-st-tropaz: #2A3E92;
+  --color-st-tropaz-hover: #1E2D69;
+  --color-st-tropaz-dark: #1B275E;
+  --color-st-tropaz-deep: #141E46;
+  --color-st-tropaz-light: #EEF2FF;
+  --color-st-tropaz-border: #CCD5EE;
+  --color-lp-yellow: #FFC72C;
+  --color-lp-gold: #F5A623;
+  --color-lp-cyan: #0098B8;
+  --color-paper-bg: #F7F9FC;
+  --color-paper-border: #DCE2EE;
+}
+
+::selection {
+  background-color: #2A3E92;
+  color: #ffffff;
+}
+
+/* Lonely Planet pre-2022 print layout accents */
+.lonely-planet-spine {
+  border-left: 4px solid #2A3E92;
+}
+
+.lonely-planet-tab {
+  background: linear-gradient(135deg, #2A3E92 0%, #1B275E 100%);
+}
+
+/* National Geographic signature editorial text styles */
+.font-natgeo-masthead {
+  font-family: var(--font-display), 'Cinzel', 'Times New Roman', serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.font-natgeo-headline {
+  font-family: var(--font-serif), 'Libre Caslon Text', Georgia, serif;
+}
+
+.font-natgeo-body {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-natgeo-feature {
+  font-family: var(--font-slab), 'Bitter', serif;
+}

@@ -1,7 +1,7 @@
 import { Article } from './Article.ts';
-import { Location } from './Location.ts';
+import { Topic } from './Topic.ts';
 
-export interface SearchLocationFilter {
+export interface SearchTopicFilter {
   query: string;
   magazineId?: number;
   year?: number;
@@ -27,9 +27,9 @@ export interface MagazineSummary {
 
 export interface IArticleRepository {
   /**
-   * Search articles by destination location (city, region, country, or location keywords)
+   * Search articles by topic (theme, subject, category, or keywords)
    */
-  searchByLocation(filter: SearchLocationFilter): Promise<SearchResult>;
+  searchByTopic(filter: SearchTopicFilter): Promise<SearchResult>;
 
   /**
    * Fetch an article by its unique ID
@@ -47,7 +47,7 @@ export interface IArticleRepository {
   getMagazines(): Promise<MagazineSummary[]>;
 
   /**
-   * Retrieve distinct indexed locations in the catalogue
+   * Retrieve distinct indexed topics in the catalogue
    */
-  getPopularLocations(): Promise<Location[]>;
+  getPopularTopics(): Promise<Topic[]>;
 }

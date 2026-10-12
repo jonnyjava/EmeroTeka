@@ -4,18 +4,18 @@ import { articles, magazineIssues, magazines } from '../../../db/schema.ts';
 import {
   IArticleRepository,
   MagazineSummary,
-  SearchLocationFilter,
+  SearchTopicFilter,
   SearchResult,
 } from '../domain/IArticleRepository.ts';
 import { Article } from '../domain/Article.ts';
-import { Location } from '../domain/Location.ts';
+import { Topic } from '../domain/Topic.ts';
 import { ArticleMapper } from './ArticleMapper.ts';
 
 export class PostgresArticleRepository implements IArticleRepository {
   /**
-   * Search articles by destination location (city, region, country, or keyword)
+   * Search articles by topic (subject, theme, category, or keyword)
    */
-  public async searchByLocation(filter: SearchLocationFilter): Promise<SearchResult> {
+  public async searchByTopic(filter: SearchTopicFilter): Promise<SearchResult> {
     try {
       const conditions = [];
 
@@ -75,7 +75,7 @@ export class PostgresArticleRepository implements IArticleRepository {
         totalCount,
       };
     } catch (error) {
-      console.error('Error executing searchByLocation in PostgresArticleRepository:', error);
+      console.error('Error executing searchByTopic in PostgresArticleRepository:', error);
       throw new Error('No se pudo completar la búsqueda en el catálogo de revistas.', { cause: error });
     }
   }
@@ -169,9 +169,9 @@ export class PostgresArticleRepository implements IArticleRepository {
   }
 
   /**
-   * Distinct popular destination locations
+   * Distinct popular topics indexed in catalogue
    */
-  public async getPopularLocations(): Promise<Location[]> {
+  public async getPopularTopics(): Promise<Topic[]> {
     try {
       const distinctRows = await db
         .selectDistinct({
@@ -184,15 +184,15 @@ export class PostgresArticleRepository implements IArticleRepository {
         .limit(20);
 
       return distinctRows.map(row =>
-        Location.create({
-          city: row.city,
-          region: row.region,
-          country: row.country,
+        Topic.create({
+          name: row.city || row.country,
+          subtopic: row.region,
+          category: row.country,
         })
       );
     } catch (error) {
-      console.error('Error fetching popular locations:', error);
-      throw new Error('Error al consultar las localidades del catálogo.', { cause: error });
+      console.error('Error fetching popular topics:', error);
+      throw new Error('Error al consultar las temáticas del catálogo.', { cause: error });
     }
   }
 }
