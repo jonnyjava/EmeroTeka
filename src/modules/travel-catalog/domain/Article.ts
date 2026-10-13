@@ -1,12 +1,11 @@
-import { Topic } from './Topic.ts';
 import { MagazineIssue } from './MagazineIssue.ts';
 
 /**
  * Domain Aggregate Root / Entity: Article
  *
  * Represents an indexed magazine article with strict domain invariants,
- * page range validations, and association with a Topic Value Object and
- * a MagazineIssue Entity.
+ * page range validations, geographic destination indexing (city, region, country),
+ * and association with a MagazineIssue Entity.
  */
 export interface ArticleProps {
   id: number;
@@ -16,7 +15,9 @@ export interface ArticleProps {
   photographer?: string | null;
   startPage: number;
   endPage: number;
-  topic: Topic;
+  city?: string | null;
+  region?: string | null;
+  country: string;
   issue: MagazineIssue;
   synopsis: string;
   tags?: string[] | null;
@@ -35,12 +36,10 @@ export interface ArticleDTO {
   endPage: number;
   pageCount: number;
   pageCitation: string;
-  topic: {
-    name: string;
-    category?: string;
-    subtopic?: string;
-    formatted: string;
-  };
+  city?: string;
+  region?: string;
+  country: string;
+  location: string;
   magazine: {
     id: number;
     name: string;
@@ -65,7 +64,9 @@ export class Article {
   private readonly _photographer?: string;
   private readonly _startPage: number;
   private readonly _endPage: number;
-  private readonly _topic: Topic;
+  private readonly _city?: string;
+  private readonly _region?: string;
+  private readonly _country: string;
   private readonly _issue: MagazineIssue;
   private readonly _synopsis: string;
   private readonly _tags: readonly string[];
@@ -81,7 +82,9 @@ export class Article {
     this._photographer = props.photographer?.trim() || undefined;
     this._startPage = props.startPage;
     this._endPage = props.endPage;
-    this._topic = props.topic;
+    this._city = props.city?.trim() || undefined;
+    this._region = props.region?.trim() || undefined;
+    this._country = props.country.trim();
     this._issue = props.issue;
     this._synopsis = props.synopsis.trim();
     this._tags = Object.freeze(props.tags ? [...props.tags] : []);
@@ -103,8 +106,8 @@ export class Article {
     if (!Number.isInteger(props.endPage) || props.endPage < props.startPage) {
       throw new Error('Article invariant violation: endPage must be greater than or equal to startPage.');
     }
-    if (!props.topic || !(props.topic instanceof Topic)) {
-      throw new Error('Article invariant violation: Article must have a valid Topic Value Object.');
+    if (!props.country || props.country.trim().length < 2) {
+      throw new Error('Article invariant violation: Country must be at least 2 characters long.');
     }
     if (!props.issue || !(props.issue instanceof MagazineIssue)) {
       throw new Error('Article invariant violation: Article must be associated with a valid MagazineIssue Entity.');
@@ -144,8 +147,16 @@ export class Article {
     return this._endPage;
   }
 
-  public get topic(): Topic {
-    return this._topic;
+  public get city(): string | undefined {
+    return this._city;
+  }
+
+  public get region(): string | undefined {
+    return this._region;
+  }
+
+  public get country(): string {
+    return this._country;
   }
 
   public get issue(): MagazineIssue {
@@ -199,10 +210,16 @@ export class Article {
   }
 
   /**
-   * Checks if this article's topic matches the given search string
+   * Formatted geographic location string
    */
-  public matchesTopic(searchQuery: string): boolean {
-    return this._topic.matches(searchQuery);
+  public getLocation(): string {
+    if (this._city) {
+      return `${this._city} · ${this._country}`;
+    }
+    if (this._region) {
+      return `${this._region} · ${this._country}`;
+    }
+    return this._country;
   }
 
   /**
@@ -219,7 +236,10 @@ export class Article {
       endPage: this._endPage,
       pageCount: this.getPageCount(),
       pageCitation: this.getPageCitation(),
-      topic: this._topic.toJSON(),
+      city: this._city,
+      region: this._region,
+      country: this._country,
+      location: this.getLocation(),
       magazine: {
         id: this._issue.magazineId,
         name: this._issue.magazineName,

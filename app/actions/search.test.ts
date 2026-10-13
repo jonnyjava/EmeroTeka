@@ -4,75 +4,96 @@ import {
   getCatalogOverviewAction,
   getArticleDetailAction,
 } from './search.ts';
-import { SearchArticlesByTopicUseCase } from '@/src/modules/travel-catalog/application/SearchArticlesByTopicUseCase.ts';
+import { SearchArticlesUseCase } from '@/src/modules/travel-catalog/application/SearchArticlesUseCase.ts';
 import { GetCatalogOverviewUseCase } from '@/src/modules/travel-catalog/application/GetCatalogOverviewUseCase.ts';
 import { PostgresArticleRepository } from '@/src/modules/travel-catalog/infrastructure/PostgresArticleRepository.ts';
 import { Article } from '@/src/modules/travel-catalog/domain/Article.ts';
-import { Topic } from '@/src/modules/travel-catalog/domain/Topic.ts';
 import { MagazineIssue } from '@/src/modules/travel-catalog/domain/MagazineIssue.ts';
 
 describe('Server Actions: search.ts', () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('searchArticlesAction', () => {
-    it('calls use case with params and returns response', async () => {
+    it('calls SearchArticlesUseCase and returns successful response', async () => {
       const mockResult = {
         success: true,
         query: 'Petra',
         articles: [],
         total: 0,
-        matchedTopics: [],
+        matchedDestinations: [],
         isEmpty: true,
       };
 
-      vi.spyOn(SearchArticlesByTopicUseCase.prototype, 'execute').mockResolvedValueOnce(mockResult);
+      vi.spyOn(SearchArticlesUseCase.prototype, 'execute').mockResolvedValueOnce(mockResult);
 
-      const response = await searchArticlesAction({ query: 'Petra', magazineId: 1, year: 2020 });
+      const response = await searchArticlesAction({
+        query: 'Petra',
+        magazineId: 1,
+        year: 2020,
+      });
+
       expect(response).toEqual(mockResult);
+      expect(SearchArticlesUseCase.prototype.execute).toHaveBeenCalledWith({
+        query: 'Petra',
+        magazineId: 1,
+        year: 2020,
+        limit: 30,
+      });
     });
 
-    it('defaults query to empty string when falsy', async () => {
+    it('catches errors and returns failure response', async () => {
+      vi.spyOn(SearchArticlesUseCase.prototype, 'execute').mockRejectedValueOnce(
+        new Error('Database error')
+      );
+
+      const response = await searchArticlesAction({
+        query: 'ErrorCase',
+      });
+
+      expect(response).toEqual({
+        success: false,
+        query: 'ErrorCase',
+        articles: [],
+        total: 0,
+        matchedDestinations: [],
+        isEmpty: true,
+      });
+    });
+
+    it('handles falsy query gracefully by passing empty string', async () => {
       const mockResult = {
         success: true,
         query: '',
         articles: [],
         total: 0,
-        matchedTopics: [],
+        matchedDestinations: [],
         isEmpty: true,
       };
 
-      const spy = vi.spyOn(SearchArticlesByTopicUseCase.prototype, 'execute').mockResolvedValueOnce(mockResult);
+      vi.spyOn(SearchArticlesUseCase.prototype, 'execute').mockResolvedValueOnce(mockResult);
 
-      const response = await searchArticlesAction({ query: '' });
-      expect(response).toEqual(mockResult);
-      expect(spy).toHaveBeenCalledWith(expect.objectContaining({ query: '' }));
-    });
+      const response = await searchArticlesAction({
+        query: '',
+      });
 
-    it('catches errors and returns failure response', async () => {
-      vi.spyOn(SearchArticlesByTopicUseCase.prototype, 'execute').mockRejectedValueOnce(
-        new Error('Database error')
-      );
-
-      const response = await searchArticlesAction({ query: 'ErrorTest' });
-      expect(response).toEqual({
-        success: false,
-        query: 'ErrorTest',
-        articles: [],
-        total: 0,
-        matchedTopics: [],
-        isEmpty: true,
+      expect(response.success).toBe(true);
+      expect(SearchArticlesUseCase.prototype.execute).toHaveBeenCalledWith({
+        query: '',
+        magazineId: undefined,
+        year: undefined,
+        limit: 30,
       });
     });
   });
 
   describe('getCatalogOverviewAction', () => {
-    it('calls use case and returns overview data', async () => {
+    it('calls GetCatalogOverviewUseCase and returns overview response', async () => {
       const mockOverview = {
-        magazines: [{ id: 1, name: 'NatGeo', issuesCount: 10, articlesCount: 50 }],
+        magazines: [],
         featuredArticles: [],
-        popularTopics: ['Kioto · Japón'],
+        popularDestinations: ['Kioto · Japón'],
       };
 
       vi.spyOn(GetCatalogOverviewUseCase.prototype, 'execute').mockResolvedValueOnce(mockOverview);
@@ -90,37 +111,38 @@ describe('Server Actions: search.ts', () => {
       expect(response).toEqual({
         magazines: [],
         featuredArticles: [],
-        popularTopics: [],
+        popularDestinations: [],
       });
     });
   });
 
   describe('getArticleDetailAction', () => {
-    it('returns article DTO when article is found', async () => {
-      const topic = Topic.create({ name: 'Petra', category: 'Jordania' });
-      const issue = MagazineIssue.create({
-        id: 1,
-        magazineId: 1,
-        magazineName: 'NatGeo',
-        issueNumber: '10',
-        year: 2020,
-      });
-      const article = Article.create({
-        id: 42,
-        title: 'Petra Revelada',
-        startPage: 10,
-        endPage: 20,
-        topic,
-        issue,
-        synopsis: 'La ciudad esculpida en la roca rosada.',
-      });
+    const sampleIssue = MagazineIssue.create({
+      id: 1,
+      magazineId: 2,
+      magazineName: 'Altaïr',
+      issueNumber: '50',
+      year: 2021,
+    });
 
-      vi.spyOn(PostgresArticleRepository.prototype, 'findById').mockResolvedValueOnce(article);
+    const sampleArticle = Article.create({
+      id: 123,
+      title: 'Mares del Sur',
+      startPage: 10,
+      endPage: 20,
+      country: 'Polinesia',
+      issue: sampleIssue,
+      synopsis: 'Navegaciones por los atolones de coral.',
+    });
 
-      const result = await getArticleDetailAction(42);
+    it('returns article DTO when article exists', async () => {
+      vi.spyOn(PostgresArticleRepository.prototype, 'findById').mockResolvedValueOnce(sampleArticle);
+
+      const result = await getArticleDetailAction(123);
       expect(result).not.toBeNull();
-      expect(result?.id).toBe(42);
-      expect(result?.title).toBe('Petra Revelada');
+      expect(result?.id).toBe(123);
+      expect(result?.title).toBe('Mares del Sur');
+      expect(result?.location).toBe('Polinesia');
     });
 
     it('returns null when article is not found', async () => {

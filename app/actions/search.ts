@@ -2,9 +2,9 @@
 
 import { PostgresArticleRepository } from '@/src/modules/travel-catalog/infrastructure/PostgresArticleRepository.ts';
 import {
-  SearchArticlesByTopicUseCase,
+  SearchArticlesUseCase,
   SearchArticlesResponse,
-} from '@/src/modules/travel-catalog/application/SearchArticlesByTopicUseCase.ts';
+} from '@/src/modules/travel-catalog/application/SearchArticlesUseCase.ts';
 import {
   GetCatalogOverviewUseCase,
   CatalogOverviewResponse,
@@ -20,7 +20,7 @@ import { ArticleDTO } from '@/src/modules/travel-catalog/domain/Article.ts';
 
 // Singleton instances for Server Actions composition
 const postgresArticleRepository = new PostgresArticleRepository();
-const searchArticlesUseCase = new SearchArticlesByTopicUseCase(postgresArticleRepository);
+const searchArticlesUseCase = new SearchArticlesUseCase(postgresArticleRepository);
 const catalogOverviewUseCase = new GetCatalogOverviewUseCase(postgresArticleRepository);
 
 export interface SearchActionParams {
@@ -30,7 +30,7 @@ export interface SearchActionParams {
 }
 
 /**
- * Server Action: Search articles by topic (theme, subject, category, or keyword)
+ * Server Action: Search articles by destination, location, title, or keywords
  */
 export async function searchArticlesAction(
   params: SearchActionParams
@@ -49,14 +49,14 @@ export async function searchArticlesAction(
       query: params.query,
       articles: [],
       total: 0,
-      matchedTopics: [],
+      matchedDestinations: [],
       isEmpty: true,
     };
   }
 }
 
 /**
- * Server Action: Load initial catalog overview (magazines list, featured articles, popular topics)
+ * Server Action: Load initial catalog overview (magazines list, featured articles, popular destinations)
  */
 export async function getCatalogOverviewAction(): Promise<CatalogOverviewResponse> {
   try {
@@ -66,7 +66,7 @@ export async function getCatalogOverviewAction(): Promise<CatalogOverviewRespons
     return {
       magazines: [],
       featuredArticles: [],
-      popularTopics: [],
+      popularDestinations: [],
     };
   }
 }

@@ -8,34 +8,42 @@ describe('ArchitectureInfoModal Component', () => {
     const { container } = render(
       <ArchitectureInfoModal isOpen={false} onClose={vi.fn()} />
     );
-    expect(container).toBeEmptyDOMElement();
+    expect(container.firstChild).toBeNull();
   });
 
-  it('renders modal content and triggers onClose callbacks', () => {
+  it('renders all 4 DDD layers, descriptions, and closes on close button or backdrop click', () => {
     const handleClose = vi.fn();
     render(<ArchitectureInfoModal isOpen={true} onClose={handleClose} />);
 
     expect(
       screen.getByText('Arquitectura Limpia & Domain-Driven Design (DDD)')
     ).toBeInTheDocument();
-    expect(screen.getByText(/1. Domain Layer/)).toBeInTheDocument();
-    expect(screen.getByText(/2. Application Layer/)).toBeInTheDocument();
-    expect(screen.getByText(/3. Infrastructure Layer/)).toBeInTheDocument();
-    expect(screen.getByText(/4. Presentation & Next.js App Router/)).toBeInTheDocument();
+
+    expect(screen.getByText(/1\. Domain Layer/)).toBeInTheDocument();
+    expect(screen.getByText(/2\. Application Layer/)).toBeInTheDocument();
+    expect(screen.getByText(/3\. Infrastructure Layer/)).toBeInTheDocument();
+    expect(screen.getByText(/4\. Presentation & Next\.js App Router/)).toBeInTheDocument();
+
+    // Close button in header
+    const closeHeaderBtn = screen.getByLabelText('Cerrar modal');
+    fireEvent.click(closeHeaderBtn);
+    expect(handleClose).toHaveBeenCalledTimes(1);
+
+    // Close button in footer
+    const footerBtn = screen.getByRole('button', { name: 'Entendido' });
+    fireEvent.click(footerBtn);
+    expect(handleClose).toHaveBeenCalledTimes(2);
 
     // Backdrop click
     const dialog = screen.getByRole('dialog');
     fireEvent.click(dialog);
-    expect(handleClose).toHaveBeenCalledTimes(1);
+    expect(handleClose).toHaveBeenCalledTimes(3);
 
-    // Top close button
-    const closeBtn = screen.getByLabelText('Cerrar modal');
-    fireEvent.click(closeBtn);
-    expect(handleClose).toHaveBeenCalledTimes(2);
-
-    // Bottom close button
-    const bottomBtn = screen.getByRole('button', { name: 'Cerrar Ventana' });
-    fireEvent.click(bottomBtn);
+    // Click inside modal should not trigger close
+    const modalHeading = screen.getByText(
+      'Arquitectura Limpia & Domain-Driven Design (DDD)'
+    );
+    fireEvent.click(modalHeading);
     expect(handleClose).toHaveBeenCalledTimes(3);
   });
 });

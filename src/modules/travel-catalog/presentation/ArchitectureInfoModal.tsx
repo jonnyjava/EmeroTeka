@@ -20,10 +20,9 @@ export const ArchitectureInfoModal: React.FC<ArchitectureInfoModalProps> = ({
       icon: ShieldCheck,
       color: 'text-[#2A3E92]',
       description:
-        'El núcleo puro del sistema sin dependencias de base de datos ni librerías externas. Contiene entidades ricas y objetos de valor con invariantes de negocio.',
+        'El núcleo puro del sistema sin dependencias de base de datos ni librerías externas. Contiene entidades ricas con invariantes de negocio y modelado geográfico directo.',
       artifacts: [
-        'Topic.ts (Value Object): Modela la temática, tema principal o categoría del artículo con inmutabilidad, equivalencia por valor y normalización semántica.',
-        'Article.ts (Entity / Aggregate Root): Valida rango de páginas (startPage <= endPage), invariantes de título y cita bibliográfica.',
+        'Article.ts (Entity / Aggregate Root): Modela el artículo con geografía directa (ciudad, región, país), rango de páginas (startPage <= endPage), invariantes de título y citas bibliográficas.',
         'MagazineIssue.ts (Entity): Encapsula volumen, número, año y cita editorial estandarizada.',
         'IArticleRepository.ts (Domain Interface): Contrato abstracto para invertir dependencias hacia la infraestructura.',
       ],
@@ -35,8 +34,8 @@ export const ArchitectureInfoModal: React.FC<ArchitectureInfoModalProps> = ({
       description:
         'Orquesta los casos de uso del catálogo. Recibe la abstracción IArticleRepository por Inversión de Control (IoC).',
       artifacts: [
-        'SearchArticlesByTopicUseCase.ts: Caso de uso principal para buscar por temática y mapear entidades a DTOs seguros.',
-        'GetCatalogOverviewUseCase.ts: Coordina la carga inicial de revistas indexadas y temáticas clave.',
+        'SearchArticlesUseCase.ts: Caso de uso principal para buscar por destinos, palabras clave y mapear entidades a DTOs seguros.',
+        'GetCatalogOverviewUseCase.ts: Coordina la carga inicial de revistas indexadas y destinos clave.',
       ],
     },
     {
@@ -59,7 +58,7 @@ export const ArchitectureInfoModal: React.FC<ArchitectureInfoModalProps> = ({
         'Interfaz editorial moderna con Tailwind CSS, Server Actions como Composition Root y paleta St Tropaz #2A3E92 estilo Lonely Planet.',
       artifacts: [
         'app/actions/search.ts (Composition Root): Instancia el repositorio de Postgres, inyecta la dependencia en el Use Case y responde a la UI.',
-        'TravelCatalogApp.tsx & componentes: Buscador interactivo por temática, portadas simuladas y modal bibliográfico.',
+        'TravelCatalogApp.tsx & componentes: Buscador interactivo por destinos, portadas simuladas y modal bibliográfico.',
       ],
     },
   ];
@@ -81,10 +80,11 @@ export const ArchitectureInfoModal: React.FC<ArchitectureInfoModalProps> = ({
           <div className="flex-1 bg-[#2A3E92]" />
         </div>
 
+        {/* Modal Header */}
         <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-md px-6 py-4 border-b-2 border-[#DCE2EE] flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <Layers className="w-5 h-5 text-[#2A3E92]" />
-            <h2 className="font-serif text-lg font-bold text-[#1B275E]">
+            <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#1B275E]">
               Arquitectura Limpia & Domain-Driven Design (DDD)
             </h2>
           </div>
@@ -99,22 +99,27 @@ export const ArchitectureInfoModal: React.FC<ArchitectureInfoModalProps> = ({
           </button>
         </div>
 
+        {/* Modal Body */}
         <div className="p-6 sm:p-8 space-y-6">
           <p className="text-sm text-[#475569] leading-relaxed">
-            Este proyecto sigue un enfoque desacoplado estricto guiado por el dominio (DDD Tactical Design) estructurado en 4 capas dentro del módulo <code className="bg-[#EEF2FF] px-1.5 py-0.5 rounded text-xs font-mono text-[#2A3E92] font-bold border border-[#CCD5EE]">/src/modules/travel-catalog</code>, conectado a Google Cloud SQL PostgreSQL y presentado con la identidad visual St Tropaz (#2A3E92) inspirada en las revistas clásicas de Lonely Planet.
+            Esta aplicación está diseñada siguiendo los principios de{' '}
+            <strong className="text-[#1B275E]">Clean Architecture</strong> y{' '}
+            <strong className="text-[#1B275E]">Domain-Driven Design (DDD)</strong> con
+            estricta separación en capas desacopladas, testeabilidad unitaria al 100% y
+            cero fugas de detalles de persistencia en el dominio.
           </p>
 
-          <div className="space-y-5">
-            {layers.map((layer, idx) => {
+          <div className="space-y-4">
+            {layers.map((layer) => {
               const Icon = layer.icon;
               return (
                 <div
-                  key={idx}
-                  className="p-5 bg-[#F8FAFC] border-2 border-[#DCE2EE] rounded-xl space-y-3"
+                  key={layer.title}
+                  className="p-5 rounded-xl border-2 border-[#DCE2EE] bg-[#F8FAFC] space-y-3"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className="w-4 h-4 text-[#2A3E92]" />
-                    <h3 className="text-sm font-bold text-[#1B275E] font-mono">
+                    <Icon className={`w-5 h-5 ${layer.color}`} />
+                    <h3 className="font-serif font-bold text-base sm:text-lg text-[#1B275E]">
                       {layer.title}
                     </h3>
                   </div>
@@ -124,13 +129,13 @@ export const ArchitectureInfoModal: React.FC<ArchitectureInfoModalProps> = ({
                   </p>
 
                   <ul className="space-y-1.5 pt-1">
-                    {layer.artifacts.map((art, aIdx) => (
+                    {layer.artifacts.map((art) => (
                       <li
-                        key={aIdx}
+                        key={art}
                         className="text-xs text-[#334155] flex items-start gap-2"
                       >
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#2A3E92] shrink-0 mt-0.5" />
-                        <span>{art}</span>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#2A3E92] mt-0.5 shrink-0" />
+                        <span className="leading-snug">{art}</span>
                       </li>
                     ))}
                   </ul>
@@ -140,13 +145,17 @@ export const ArchitectureInfoModal: React.FC<ArchitectureInfoModalProps> = ({
           </div>
         </div>
 
-        <div className="sticky bottom-0 bg-[#F8FAFC] px-6 py-3.5 border-t-2 border-[#DCE2EE] flex items-center justify-end">
+        {/* Modal Footer */}
+        <div className="bg-[#F8FAFC] px-6 py-4 border-t-2 border-[#DCE2EE] flex items-center justify-between text-xs text-slate-500">
+          <span className="font-mono text-slate-500">
+            Next.js App Router · Strict TypeScript · Cloud SQL
+          </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-bold text-[#1B275E] bg-white border border-[#CCD5EE] rounded-lg hover:bg-[#EEF2FF] hover:text-[#2A3E92] transition-colors cursor-pointer"
+            className="px-4 py-2 bg-[#2A3E92] hover:bg-[#1E2D69] text-white font-bold rounded-lg transition-colors cursor-pointer"
           >
-            Cerrar Ventana
+            Entendido
           </button>
         </div>
       </div>

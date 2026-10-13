@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { Search, X, MapPin, SlidersHorizontal, RotateCcw, Tag } from 'lucide-react';
+import { Search, X, MapPin, RotateCcw } from 'lucide-react';
 import { MagazineSummary } from '../domain/IArticleRepository.ts';
 
 interface LocationSearchBarProps {
@@ -13,7 +13,6 @@ interface LocationSearchBarProps {
   onYearChange: (year?: number) => void;
   magazines: MagazineSummary[];
   popularDestinations?: string[];
-  popularTopics?: string[];
   totalResults: number;
   isLoading: boolean;
   onReset: () => void;
@@ -29,7 +28,6 @@ export const LocationSearchBar: React.FC<LocationSearchBarProps> = ({
   onYearChange,
   magazines,
   popularDestinations,
-  popularTopics,
   totalResults,
   isLoading,
   onReset,
@@ -38,7 +36,7 @@ export const LocationSearchBar: React.FC<LocationSearchBarProps> = ({
   const internalRef = useRef<HTMLInputElement>(null);
   const activeInputRef = inputRef || internalRef;
 
-  const topicsList = popularTopics || popularDestinations || [];
+  const destinationsList = popularDestinations || [];
 
   const availableYears = [
     2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015,
@@ -53,13 +51,13 @@ export const LocationSearchBar: React.FC<LocationSearchBarProps> = ({
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 pb-6 border-b-2 border-[#DCE2EE]">
         <div>
           <span className="text-xs uppercase tracking-wider font-mono text-[#2A3E92] font-bold block mb-1">
-            Índice de Temáticas y Hemeroteca
+            Índice Geográfico y Hemeroteca
           </span>
           <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#1B275E] tracking-tight">
             Localizador Bibliográfico de Artículos
           </h2>
           <p className="text-sm text-[#475569] mt-1 max-w-2xl leading-relaxed">
-            Ingresa una temática, ciudad o reporte para descubrir con precisión milimétrica la revista, volumen, año y páginas exactas donde fue publicado.
+            Ingresa un destino, ciudad, país o reporte para descubrir con precisión milimétrica la revista, volumen, año y páginas exactas donde fue publicado.
           </p>
         </div>
 
@@ -87,7 +85,7 @@ export const LocationSearchBar: React.FC<LocationSearchBarProps> = ({
             type="text"
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
-            placeholder="Buscar por temática o destino (ej. Petra, Kioto, Arqueología, Svalbard, Positano)..."
+            placeholder="Buscar por destino o palabra clave (ej. Petra, Kioto, Svalbard, Positano)..."
             className="w-full pl-12 pr-28 py-3.5 bg-[#F8FAFC] border-2 border-[#CCD5EE] focus:border-[#2A3E92] focus:bg-white rounded-xl text-base text-[#1B275E] placeholder:text-slate-400 font-medium transition-all shadow-2xs focus:outline-hidden focus:ring-4 focus:ring-[#2A3E92]/15"
           />
 
@@ -163,24 +161,24 @@ export const LocationSearchBar: React.FC<LocationSearchBarProps> = ({
           </div>
         </div>
 
-        {/* Quick Topics */}
-        {topicsList.length > 0 && (
+        {/* Quick Destinations */}
+        {destinationsList.length > 0 && (
           <div className="pt-3 border-t-2 border-[#DCE2EE] flex flex-wrap items-center gap-1.5">
             <span className="text-xs font-mono text-[#2A3E92] font-bold uppercase mr-1">
-              Temáticas:
+              Destinos:
             </span>
-            {topicsList.slice(0, 8).map((topic) => (
+            {destinationsList.slice(0, 8).map((destination) => (
               <button
-                key={topic}
+                key={destination}
                 type="button"
-                onClick={() => onQueryChange(topic)}
+                onClick={() => onQueryChange(destination)}
                 className={`text-xs px-2.5 py-1 rounded-md border font-medium transition-colors ${
-                  query.toLowerCase() === topic.toLowerCase()
+                  query.toLowerCase() === destination.toLowerCase()
                     ? 'bg-[#2A3E92] text-white border-[#2A3E92] font-bold'
                     : 'bg-[#F8FAFC] text-[#1B275E] border-[#CCD5EE] hover:bg-[#EEF2FF] hover:border-[#2A3E92]'
                 }`}
               >
-                {topic}
+                {destination}
               </button>
             ))}
           </div>

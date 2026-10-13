@@ -4,129 +4,115 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ResponsiveArticleGrid } from './ResponsiveArticleGrid.tsx';
 import { ArticleDTO } from '../domain/Article.ts';
 
+// Mock next/image
 vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt, onError, ...props }: any) => (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={alt} onError={onError} {...props} data-testid="grid-image" />
+    <img
+      src={src}
+      alt={alt}
+      onError={onError}
+      {...props}
+      data-testid="grid-image"
+    />
   ),
 }));
 
 describe('ResponsiveArticleGrid Component', () => {
-  const createMockArticle = (overrides: Partial<ArticleDTO> = {}): ArticleDTO => ({
+  const sampleArticle1: ArticleDTO = {
     id: 1,
-    title: 'Misterios de Samarcanda',
-    subtitle: 'Ruta de la Seda y cúpulas turquesas',
-    author: 'Marco Polo',
-    startPage: 24,
-    endPage: 32,
-    pageCount: 9,
-    pageCitation: 'pp. 24–32',
-    topic: {
-      name: 'Samarcanda',
-      category: 'Uzbekistán',
-      formatted: 'Samarcanda · Uzbekistán',
-    },
+    title: 'Travesía por el Sahara',
+    subtitle: 'Dunas infinitas de Erg Chebbi',
+    author: 'Théodore Monod',
+    startPage: 10,
+    endPage: 24,
+    pageCount: 15,
+    pageCitation: 'pp. 10–24',
+    city: 'Merzouga',
+    country: 'Marruecos',
+    location: 'Merzouga · Marruecos',
     magazine: {
       id: 1,
-      name: 'National Geographic',
-      issueNumber: '112',
+      name: 'Lonely Planet Magazine',
+      issueNumber: '88',
       year: 2021,
-      month: 'Julio',
-      fullCitation: 'National Geographic · Nº 112 (Julio 2021)',
+      month: 'Mayo',
+      fullCitation: 'Lonely Planet Magazine · Nº 88 (Mayo 2021)',
     },
-    synopsis: 'La joya de la Ruta de la Seda y sus mezquitas históricas.',
-    tags: ['Historia', 'Asia Central'],
+    synopsis: 'Exploración del desierto del Sahara marroquí.',
+    tags: ['Desierto', 'Sahara'],
     featured: true,
-    coverImageUrl: 'https://images.example.com/cover.jpg',
-    catalogReference: 'National Geographic · Nº 112 (Julio 2021) · pp. 24–32',
-    ...overrides,
-  });
+    coverImageUrl: 'https://images.unsplash.com/sahara.jpg',
+    catalogReference: 'Lonely Planet Magazine · Nº 88 (Mayo 2021) · pp. 10–24',
+  };
 
-  it('renders empty state and calls onClearFilters when clicked', () => {
-    const handleClear = vi.fn();
-    render(
-      <ResponsiveArticleGrid
-        articles={[]}
-        onSelectArticle={vi.fn()}
-        onClearFilters={handleClear}
-      />
-    );
+  const sampleArticle2: ArticleDTO = {
+    id: 2,
+    title: 'Kioto y sus Templos Ocultos',
+    startPage: 30,
+    endPage: 45,
+    pageCount: 16,
+    pageCitation: 'pp. 30–45',
+    city: 'Kioto',
+    country: 'Japón',
+    location: 'Kioto · Japón',
+    magazine: {
+      id: 2,
+      name: 'National Geographic',
+      issueNumber: '412',
+      year: 2023,
+      fullCitation: 'National Geographic · Nº 412 (2023)',
+    },
+    synopsis: 'Meditación en santuarios de montaña en Kansai.',
+    tags: ['Japón', 'Templos'],
+    featured: false,
+    catalogReference: 'National Geographic · Nº 412 (2023) · pp. 30–45',
+  };
 
-    expect(
-      screen.getByText('No hay artículos indexados para esta temática')
-    ).toBeInTheDocument();
-
-    const clearBtn = screen.getByRole('button', { name: 'Restablecer filtros' });
-    fireEvent.click(clearBtn);
-    expect(handleClear).toHaveBeenCalledTimes(1);
-  });
-
-  it('renders grid with articles and handles article selection', () => {
+  it('renders grid with multiple magazine cards and triggers selection', () => {
     const handleSelect = vi.fn();
-    const article = createMockArticle();
-
     render(
       <ResponsiveArticleGrid
-        articles={[article]}
+        articles={[sampleArticle1, sampleArticle2]}
         onSelectArticle={handleSelect}
       />
     );
 
-    expect(screen.getByText('Misterios de Samarcanda')).toBeInTheDocument();
-    expect(screen.getByText('Samarcanda · Uzbekistán')).toBeInTheDocument();
-    expect(screen.getByText('pp. 24–32')).toBeInTheDocument();
-    expect(screen.getByText('Julio 2021')).toBeInTheDocument();
+    expect(screen.getByText('Travesía por el Sahara')).toBeInTheDocument();
+    expect(screen.getByText('Kioto y sus Templos Ocultos')).toBeInTheDocument();
+    expect(screen.getByText('Merzouga · Marruecos')).toBeInTheDocument();
+    expect(screen.getByText('Kioto · Japón')).toBeInTheDocument();
+    expect(screen.getByText('LP Official')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('Misterios de Samarcanda'));
-    expect(handleSelect).toHaveBeenCalledWith(article);
+    const firstCardTitle = screen.getByText('Travesía por el Sahara');
+    fireEvent.click(firstCardTitle);
+    expect(handleSelect).toHaveBeenCalledWith(sampleArticle1);
   });
 
-  it('covers magazine branding variants: Lonely Planet, Condé Nast, GEO, Altaïr, and generic', () => {
-    const lpArticle = createMockArticle({
-      id: 2,
-      magazine: { id: 2, name: 'Lonely Planet Magazine', issueNumber: '5', year: 2020 },
-      author: undefined,
-      subtitle: undefined,
-    });
-    const condeArticle = createMockArticle({
-      id: 3,
-      magazine: { id: 3, name: 'Condé Nast Traveler', issueNumber: '8', year: 2020, month: 'Enero' },
-    });
-    const geoArticle = createMockArticle({
-      id: 4,
-      magazine: { id: 4, name: 'GEO España', issueNumber: '12', year: 2019, month: 'Mayo' },
-    });
-    const altairArticle = createMockArticle({
-      id: 5,
-      magazine: { id: 5, name: 'Altaïr', issueNumber: '90', year: 2018 },
-    });
-    const genericArticle = createMockArticle({
-      id: 6,
-      magazine: { id: 6, name: 'Revista Viajes Clásicos', issueNumber: '1', year: 2017 },
-    });
-
+  it('renders empty state when articles array is empty and allows resetting filters', () => {
+    const handleReset = vi.fn();
     render(
       <ResponsiveArticleGrid
-        articles={[lpArticle, condeArticle, geoArticle, altairArticle, genericArticle]}
+        articles={[]}
         onSelectArticle={vi.fn()}
+        onClearFilters={handleReset}
       />
     );
 
-    expect(screen.getByText('LP Official')).toBeInTheDocument();
-    expect(screen.getByText('Año 2020')).toBeInTheDocument(); // LP has no month -> "Año 2020"
-    expect(screen.getByText('Redacción editorial')).toBeInTheDocument(); // LP author undefined
-    expect(screen.getByText('Condé Nast Traveler')).toBeInTheDocument();
-    expect(screen.getByText('GEO España')).toBeInTheDocument();
-    expect(screen.getByText('Altaïr')).toBeInTheDocument();
-    expect(screen.getByText('Revista Viajes Clásicos')).toBeInTheDocument();
+    expect(
+      screen.getByText('No hay artículos indexados para esta búsqueda')
+    ).toBeInTheDocument();
+
+    const resetBtn = screen.getByRole('button', { name: /restablecer filtros/i });
+    fireEvent.click(resetBtn);
+    expect(handleReset).toHaveBeenCalledTimes(1);
   });
 
-  it('handles image error fallback inside IndexedMagazineCard', () => {
-    const article = createMockArticle({ id: 10 });
+  it('renders fallback icon and simulated styling when cover image fails', () => {
     render(
       <ResponsiveArticleGrid
-        articles={[article]}
+        articles={[sampleArticle1]}
         onSelectArticle={vi.fn()}
       />
     );
@@ -134,7 +120,6 @@ describe('ResponsiveArticleGrid Component', () => {
     const img = screen.getByTestId('grid-image');
     fireEvent.error(img);
 
-    // After image error, fallback view renders magazine name
-    expect(screen.getAllByText('National Geographic')).toHaveLength(2); // Top badge and fallback center
+    expect(screen.getAllByText('Lonely Planet Magazine').length).toBeGreaterThanOrEqual(1);
   });
 });

@@ -45,11 +45,9 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
     endPage: 28,
     pageCount: 17,
     pageCitation: 'pp. 12–28',
-    topic: {
-      name: 'Svalbard',
-      category: 'Noruega',
-      formatted: 'Svalbard · Noruega',
-    },
+    city: 'Svalbard',
+    country: 'Noruega',
+    location: 'Svalbard · Noruega',
     magazine: {
       id: 1,
       name: 'National Geographic',
@@ -71,7 +69,7 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
       query: '',
       articles: [sampleArticle],
       total: 1,
-      matchedTopics: ['Svalbard · Noruega'],
+      matchedDestinations: ['Svalbard · Noruega'],
       isEmpty: false,
     });
   });
@@ -81,7 +79,7 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
       <TravelCatalogApp
         initialMagazines={sampleMagazines}
         initialArticles={[sampleArticle]}
-        initialTopics={['Svalbard · Noruega', 'Kioto · Japón']}
+        initialDestinations={['Svalbard · Noruega', 'Kioto · Japón']}
       />
     );
 
@@ -119,7 +117,7 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
       />
     );
 
-    // Open from header nav using exact accessible name
+    // Open from header nav
     const headerArchBtn = screen.getByRole('button', { name: 'Arquitectura DDD' });
     fireEvent.click(headerArchBtn);
 
@@ -155,7 +153,7 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
       query: 'Kioto',
       articles: [searchResultArticle],
       total: 1,
-      matchedTopics: ['Kioto · Japón'],
+      matchedDestinations: ['Kioto · Japón'],
       isEmpty: false,
     });
 
@@ -166,7 +164,7 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText(/buscar temática o destino/i);
+    const input = screen.getByPlaceholderText(/buscar destino, ciudad o país/i);
     fireEvent.change(input, { target: { value: 'Kioto' } });
 
     // Advance debounce timer
@@ -184,7 +182,6 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
   });
 
   it('handles selecting magazine from showcase and resetting filters', () => {
-    // Setup mock scrollIntoView for #buscador
     const buscadorElem = document.createElement('div');
     buscadorElem.id = 'buscador';
     buscadorElem.scrollIntoView = vi.fn();
@@ -219,7 +216,7 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
       query: 'Failed',
       articles: [],
       total: 0,
-      matchedTopics: [],
+      matchedDestinations: [],
       isEmpty: true,
     });
 
@@ -230,7 +227,7 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText(/buscar temática o destino/i);
+    const input = screen.getByPlaceholderText(/buscar destino, ciudad o país/i);
     fireEvent.change(input, { target: { value: 'Failed' } });
 
     await act(async () => {
@@ -275,7 +272,7 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
     expect(() => fireEvent.click(exploreButton)).not.toThrow();
   });
 
-  it('scrolls into view and focuses search input when Buscar Temática is clicked in header', () => {
+  it('scrolls into view and focuses search input when Explorar Archivo is clicked in header', () => {
     const scrollMock = vi.fn();
     const buscadorDiv = document.createElement('div');
     buscadorDiv.id = 'buscador';

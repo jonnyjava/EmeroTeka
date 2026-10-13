@@ -1,133 +1,110 @@
 import { describe, it, expect } from 'vitest';
 import { Article } from './Article.ts';
-import { Topic } from './Topic.ts';
 import { MagazineIssue } from './MagazineIssue.ts';
 
 describe('Article Aggregate Root', () => {
-  const sampleTopic = Topic.create({
-    name: 'Machu Picchu',
-    subtopic: 'Cusco',
-    category: 'Perú',
-  });
-
   const sampleIssue = MagazineIssue.create({
     id: 1,
     magazineId: 10,
-    magazineName: 'Viajes National Geographic',
-    issueNumber: '150',
+    magazineName: 'National Geographic',
+    issueNumber: '315',
     year: 2021,
-    month: 'Mayo',
-    volume: 'Vol. 12',
-    coverImageUrl: 'https://images.example.com/issue-cover.jpg',
+    month: 'Noviembre',
+    coverImageUrl: 'https://images.unsplash.com/photo-sample.jpg',
   });
 
+  const validProps = {
+    id: 100,
+    title: 'Crónicas de los Andes',
+    subtitle: 'Viaje a través del Valle Sagrado',
+    author: 'Mario Vargas',
+    photographer: 'Martin Chambi',
+    startPage: 40,
+    endPage: 55,
+    city: 'Cusco',
+    region: 'Valle Sagrado',
+    country: 'Perú',
+    issue: sampleIssue,
+    synopsis: 'Un recorrido detallado por la arquitectura y senderos incas.',
+    tags: ['Inca', 'Andes', 'Arqueología'],
+    featured: true,
+    coverImageUrl: 'https://images.unsplash.com/cover-article.jpg',
+    createdAt: new Date('2021-11-01T00:00:00Z'),
+  };
+
   describe('Creation and Invariants', () => {
-    it('creates a valid Article with minimal valid properties', () => {
+    it('creates a valid Article instance with full properties', () => {
+      const article = Article.create(validProps);
+
+      expect(article.id).toBe(100);
+      expect(article.title).toBe('Crónicas de los Andes');
+      expect(article.subtitle).toBe('Viaje a través del Valle Sagrado');
+      expect(article.author).toBe('Mario Vargas');
+      expect(article.photographer).toBe('Martin Chambi');
+      expect(article.startPage).toBe(40);
+      expect(article.endPage).toBe(55);
+      expect(article.city).toBe('Cusco');
+      expect(article.region).toBe('Valle Sagrado');
+      expect(article.country).toBe('Perú');
+      expect(article.issue).toBe(sampleIssue);
+      expect(article.synopsis).toBe('Un recorrido detallado por la arquitectura y senderos incas.');
+      expect(article.tags).toEqual(['Inca', 'Andes', 'Arqueología']);
+      expect(article.featured).toBe(true);
+      expect(article.coverImageUrl).toBe('https://images.unsplash.com/cover-article.jpg');
+      expect(article.createdAt).toEqual(new Date('2021-11-01T00:00:00Z'));
+    });
+
+    it('creates an article with minimal optional fields', () => {
       const article = Article.create({
         id: 101,
-        title: 'El Enigma de los Incas',
-        startPage: 34,
-        endPage: 48,
-        topic: sampleTopic,
+        title: 'Ruta Polar',
+        startPage: 1,
+        endPage: 1,
+        country: 'Noruega',
         issue: sampleIssue,
-        synopsis: 'Un recorrido detallado por la ciudadela sagrada de los incas.',
+        synopsis: 'Breve crónica sobre navegación entre fiordos.',
       });
 
-      expect(article.id).toBe(101);
-      expect(article.title).toBe('El Enigma de los Incas');
       expect(article.subtitle).toBeUndefined();
       expect(article.author).toBeUndefined();
       expect(article.photographer).toBeUndefined();
-      expect(article.startPage).toBe(34);
-      expect(article.endPage).toBe(48);
-      expect(article.topic).toBe(sampleTopic);
-      expect(article.issue).toBe(sampleIssue);
-      expect(article.synopsis).toBe(
-        'Un recorrido detallado por la ciudadela sagrada de los incas.'
-      );
+      expect(article.city).toBeUndefined();
+      expect(article.region).toBeUndefined();
+      expect(article.country).toBe('Noruega');
       expect(article.tags).toEqual([]);
       expect(article.featured).toBe(false);
       expect(article.coverImageUrl).toBeUndefined();
       expect(article.createdAt).toBeUndefined();
     });
 
-    it('creates a valid Article with all optional fields and trims whitespace', () => {
-      const date = new Date('2021-05-01');
-      const article = Article.create({
-        id: 102,
-        title: '  Tesoros del Nilo  ',
-        subtitle: '  Templos y tumbas  ',
-        author: '  Howard Carter  ',
-        photographer: '  Harry Burton  ',
-        startPage: 12,
-        endPage: 25,
-        topic: sampleTopic,
-        issue: sampleIssue,
-        synopsis: '  Exploración arqueológica del Valle de los Reyes en Luxor.  ',
-        tags: ['Arqueología', 'Egipto', 'Historia'],
-        featured: true,
-        coverImageUrl: '  https://images.example.com/article-cover.jpg  ',
-        createdAt: date,
-      });
-
-      expect(article.title).toBe('Tesoros del Nilo');
-      expect(article.subtitle).toBe('Templos y tumbas');
-      expect(article.author).toBe('Howard Carter');
-      expect(article.photographer).toBe('Harry Burton');
-      expect(article.tags).toEqual(['Arqueología', 'Egipto', 'Historia']);
-      expect(article.featured).toBe(true);
-      expect(article.coverImageUrl).toBe('https://images.example.com/article-cover.jpg');
-      expect(article.createdAt).toBe(date);
-    });
-
-    it('throws error when title is shorter than 3 characters or empty', () => {
+    it('throws error when title is missing or shorter than 3 characters', () => {
       expect(() =>
         Article.create({
-          id: 1,
-          title: '  ',
-          startPage: 1,
-          endPage: 5,
-          topic: sampleTopic,
-          issue: sampleIssue,
-          synopsis: 'Sinopsis suficientemente larga para pasar el validador.',
+          ...validProps,
+          title: '',
         })
       ).toThrow('Article invariant violation: Title must be at least 3 characters long.');
 
       expect(() =>
         Article.create({
-          id: 1,
-          title: 'ab',
-          startPage: 1,
-          endPage: 5,
-          topic: sampleTopic,
-          issue: sampleIssue,
-          synopsis: 'Sinopsis suficientemente larga para pasar el validador.',
+          ...validProps,
+          title: '  ab  ',
         })
       ).toThrow('Article invariant violation: Title must be at least 3 characters long.');
     });
 
-    it('throws error when startPage is not a positive integer >= 1', () => {
+    it('throws error when startPage is not a positive integer', () => {
       expect(() =>
         Article.create({
-          id: 1,
-          title: 'Título Válido',
+          ...validProps,
           startPage: 0,
-          endPage: 5,
-          topic: sampleTopic,
-          issue: sampleIssue,
-          synopsis: 'Sinopsis suficientemente larga para pasar el validador.',
         })
       ).toThrow('Article invariant violation: startPage must be a positive integer greater than or equal to 1.');
 
       expect(() =>
         Article.create({
-          id: 1,
-          title: 'Título Válido',
-          startPage: 1.5,
-          endPage: 5,
-          topic: sampleTopic,
-          issue: sampleIssue,
-          synopsis: 'Sinopsis suficientemente larga para pasar el validador.',
+          ...validProps,
+          startPage: 2.5,
         })
       ).toThrow('Article invariant violation: startPage must be a positive integer greater than or equal to 1.');
     });
@@ -135,234 +112,136 @@ describe('Article Aggregate Root', () => {
     it('throws error when endPage is less than startPage or not an integer', () => {
       expect(() =>
         Article.create({
-          id: 1,
-          title: 'Título Válido',
-          startPage: 10,
-          endPage: 9,
-          topic: sampleTopic,
-          issue: sampleIssue,
-          synopsis: 'Sinopsis suficientemente larga para pasar el validador.',
+          ...validProps,
+          startPage: 20,
+          endPage: 19,
         })
       ).toThrow('Article invariant violation: endPage must be greater than or equal to startPage.');
 
       expect(() =>
         Article.create({
-          id: 1,
-          title: 'Título Válido',
-          startPage: 10,
-          endPage: 12.3,
-          topic: sampleTopic,
-          issue: sampleIssue,
-          synopsis: 'Sinopsis suficientemente larga para pasar el validador.',
+          ...validProps,
+          startPage: 20,
+          endPage: 25.5,
         })
       ).toThrow('Article invariant violation: endPage must be greater than or equal to startPage.');
     });
 
-    it('throws error when topic is invalid or not an instance of Topic', () => {
+    it('throws error when country is missing or too short', () => {
       expect(() =>
         Article.create({
-          id: 1,
-          title: 'Título Válido',
-          startPage: 1,
-          endPage: 5,
-          topic: null as unknown as Topic,
-          issue: sampleIssue,
-          synopsis: 'Sinopsis suficientemente larga para pasar el validador.',
+          ...validProps,
+          country: '',
         })
-      ).toThrow('Article invariant violation: Article must have a valid Topic Value Object.');
+      ).toThrow('Article invariant violation: Country must be at least 2 characters long.');
 
       expect(() =>
         Article.create({
-          id: 1,
-          title: 'Título Válido',
-          startPage: 1,
-          endPage: 5,
-          topic: { name: 'Falso' } as unknown as Topic,
-          issue: sampleIssue,
-          synopsis: 'Sinopsis suficientemente larga para pasar el validador.',
+          ...validProps,
+          country: 'A',
         })
-      ).toThrow('Article invariant violation: Article must have a valid Topic Value Object.');
+      ).toThrow('Article invariant violation: Country must be at least 2 characters long.');
     });
 
-    it('throws error when issue is invalid or not an instance of MagazineIssue', () => {
+    it('throws error when issue is missing or invalid', () => {
       expect(() =>
         Article.create({
-          id: 1,
-          title: 'Título Válido',
-          startPage: 1,
-          endPage: 5,
-          topic: sampleTopic,
+          ...validProps,
           issue: null as unknown as MagazineIssue,
-          synopsis: 'Sinopsis suficientemente larga para pasar el validador.',
         })
       ).toThrow('Article invariant violation: Article must be associated with a valid MagazineIssue Entity.');
 
       expect(() =>
         Article.create({
-          id: 1,
-          title: 'Título Válido',
-          startPage: 1,
-          endPage: 5,
-          topic: sampleTopic,
+          ...validProps,
           issue: { id: 1 } as unknown as MagazineIssue,
-          synopsis: 'Sinopsis suficientemente larga para pasar el validador.',
         })
       ).toThrow('Article invariant violation: Article must be associated with a valid MagazineIssue Entity.');
     });
 
-    it('throws error when synopsis is shorter than 10 characters or empty', () => {
+    it('throws error when synopsis is missing or shorter than 10 characters', () => {
       expect(() =>
         Article.create({
-          id: 1,
-          title: 'Título Válido',
-          startPage: 1,
-          endPage: 5,
-          topic: sampleTopic,
-          issue: sampleIssue,
-          synopsis: 'Corta',
+          ...validProps,
+          synopsis: '',
         })
       ).toThrow('Article invariant violation: Synopsis must be at least 10 characters long.');
 
       expect(() =>
         Article.create({
-          id: 1,
-          title: 'Título Válido',
-          startPage: 1,
-          endPage: 5,
-          topic: sampleTopic,
-          issue: sampleIssue,
-          synopsis: '          ',
+          ...validProps,
+          synopsis: 'Corto',
         })
       ).toThrow('Article invariant violation: Synopsis must be at least 10 characters long.');
     });
   });
 
-  describe('Page Metrics and Citation Formats', () => {
-    it('calculates page count correctly for multiple pages', () => {
-      const article = Article.create({
-        id: 1,
-        title: 'Explorando Islandia',
-        startPage: 10,
-        endPage: 25,
-        topic: sampleTopic,
-        issue: sampleIssue,
-        synopsis: 'Ruta completa por cascadas y glaciares nórdicos.',
-      });
+  describe('Calculated Properties and Citations', () => {
+    it('calculates page count correctly for multiple pages and single page', () => {
+      const multiPage = Article.create({ ...validProps, startPage: 10, endPage: 25 });
+      expect(multiPage.getPageCount()).toBe(16);
 
-      expect(article.getPageCount()).toBe(16);
-      expect(article.getPageCitation()).toBe('pp. 10–25');
+      const singlePage = Article.create({ ...validProps, startPage: 5, endPage: 5 });
+      expect(singlePage.getPageCount()).toBe(1);
     });
 
-    it('formats single page citation as "p. X"', () => {
-      const article = Article.create({
-        id: 2,
-        title: 'Rincón Gastronómico',
-        startPage: 42,
-        endPage: 42,
-        topic: sampleTopic,
-        issue: sampleIssue,
-        synopsis: 'Una página de recomendaciones culinarias locales.',
-      });
+    it('generates correct bibliographic page citations', () => {
+      const multiPage = Article.create({ ...validProps, startPage: 12, endPage: 20 });
+      expect(multiPage.getPageCitation()).toBe('pp. 12–20');
 
-      expect(article.getPageCount()).toBe(1);
-      expect(article.getPageCitation()).toBe('p. 42');
+      const singlePage = Article.create({ ...validProps, startPage: 15, endPage: 15 });
+      expect(singlePage.getPageCitation()).toBe('p. 15');
     });
 
-    it('generates full catalog reference combining issue citation and pages', () => {
-      const article = Article.create({
-        id: 3,
-        title: 'Misterios de Creta',
-        startPage: 14,
-        endPage: 22,
-        topic: sampleTopic,
-        issue: sampleIssue,
-        synopsis: 'El palacio de Cnosos y la leyenda del laberinto del Minotauro.',
-      });
-
+    it('builds full catalog reference combining issue citation and pages', () => {
+      const article = Article.create(validProps);
       expect(article.getCatalogReference()).toBe(
-        'Viajes National Geographic · Vol. 12, Nº 150 (Mayo 2021) · pp. 14–22'
+        'National Geographic · Nº 315 (Noviembre 2021) · pp. 40–55'
       );
     });
-  });
 
-  describe('Topic Search and DTO Mapping', () => {
-    it('delegates matchesTopic to Topic value object', () => {
-      const article = Article.create({
-        id: 4,
-        title: 'Crónica del Machu Picchu',
-        startPage: 1,
-        endPage: 10,
-        topic: sampleTopic,
-        issue: sampleIssue,
-        synopsis: 'Detalles de la expedición por el Camino Inca.',
+    it('formats location correctly with city, region, or country only', () => {
+      const withCity = Article.create({
+        ...validProps,
+        city: 'Cusco',
+        region: 'Andes',
+        country: 'Perú',
       });
+      expect(withCity.getLocation()).toBe('Cusco · Perú');
 
-      expect(article.matchesTopic('machu picchu')).toBe(true);
-      expect(article.matchesTopic('cusco')).toBe(true);
-      expect(article.matchesTopic('peru')).toBe(true);
-      expect(article.matchesTopic('tokio')).toBe(false);
+      const withRegionOnly = Article.create({
+        ...validProps,
+        city: undefined,
+        region: 'Patagonia',
+        country: 'Argentina',
+      });
+      expect(withRegionOnly.getLocation()).toBe('Patagonia · Argentina');
+
+      const withCountryOnly = Article.create({
+        ...validProps,
+        city: undefined,
+        region: undefined,
+        country: 'Japón',
+      });
+      expect(withCountryOnly.getLocation()).toBe('Japón');
     });
 
-    it('maps article correctly to DTO using issue cover image fallback when article has none', () => {
-      const article = Article.create({
-        id: 5,
-        title: 'Selva Amazónica',
-        startPage: 50,
-        endPage: 60,
-        topic: sampleTopic,
-        issue: sampleIssue,
-        synopsis: 'Expedición en canoa por el río Madre de Dios.',
+    it('maps correctly to DTO with fallback cover image from issue', () => {
+      const articleWithoutCover = Article.create({
+        ...validProps,
+        coverImageUrl: undefined,
       });
 
-      const dto = article.toDTO();
-
-      expect(dto).toEqual({
-        id: 5,
-        title: 'Selva Amazónica',
-        subtitle: undefined,
-        author: undefined,
-        photographer: undefined,
-        startPage: 50,
-        endPage: 60,
-        pageCount: 11,
-        pageCitation: 'pp. 50–60',
-        topic: {
-          name: 'Machu Picchu',
-          category: 'Perú',
-          subtopic: 'Cusco',
-          formatted: "Machu Picchu · Cusco · Perú",
-        },
-        magazine: {
-          id: 10,
-          name: 'Viajes National Geographic',
-          issueNumber: '150',
-          year: 2021,
-          month: 'Mayo',
-          fullCitation: 'Viajes National Geographic · Vol. 12, Nº 150 (Mayo 2021)',
-          coverImageUrl: 'https://images.example.com/issue-cover.jpg',
-        },
-        synopsis: 'Expedición en canoa por el río Madre de Dios.',
-        tags: [],
-        featured: false,
-        coverImageUrl: 'https://images.example.com/issue-cover.jpg',
-        catalogReference: 'Viajes National Geographic · Vol. 12, Nº 150 (Mayo 2021) · pp. 50–60',
-      });
-    });
-
-    it('maps article to DTO with explicit cover image overriding issue cover image', () => {
-      const article = Article.create({
-        id: 6,
-        title: 'Selva Amazónica Especial',
-        startPage: 50,
-        endPage: 60,
-        topic: sampleTopic,
-        issue: sampleIssue,
-        synopsis: 'Expedición en canoa por el río Madre de Dios.',
-        coverImageUrl: 'https://images.example.com/custom-article-cover.jpg',
-      });
-
-      const dto = article.toDTO();
-      expect(dto.coverImageUrl).toBe('https://images.example.com/custom-article-cover.jpg');
+      const dto = articleWithoutCover.toDTO();
+      expect(dto.id).toBe(100);
+      expect(dto.title).toBe('Crónicas de los Andes');
+      expect(dto.location).toBe('Cusco · Perú');
+      expect(dto.city).toBe('Cusco');
+      expect(dto.region).toBe('Valle Sagrado');
+      expect(dto.country).toBe('Perú');
+      expect(dto.coverImageUrl).toBe(sampleIssue.coverImageUrl);
+      expect(dto.magazine.name).toBe('National Geographic');
+      expect(dto.magazine.fullCitation).toBe('National Geographic · Nº 315 (Noviembre 2021)');
     });
   });
 });

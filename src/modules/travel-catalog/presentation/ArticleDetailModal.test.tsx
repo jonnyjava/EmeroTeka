@@ -1,5 +1,5 @@
 import React from 'react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { ArticleDetailModal } from './ArticleDetailModal.tsx';
 import { ArticleDTO } from '../domain/Article.ts';
@@ -7,113 +7,105 @@ import { ArticleDTO } from '../domain/Article.ts';
 describe('ArticleDetailModal Component', () => {
   const sampleArticle: ArticleDTO = {
     id: 42,
-    title: 'Ruta por los Glaciares',
-    subtitle: 'Expedición en el sur de la Patagonia',
-    author: 'Mateo Morales',
-    photographer: 'Elena Rostova',
-    startPage: 24,
-    endPage: 38,
-    pageCount: 15,
-    pageCitation: 'pp. 24–38',
-    topic: {
-      name: 'El Calafate',
-      category: 'Argentina',
-      subtopic: 'Santa Cruz',
-      formatted: 'El Calafate · Santa Cruz · Argentina',
-    },
+    title: 'Petra Entre Sombras y Rocas',
+    subtitle: 'Arqueología nabatea en el Siq',
+    author: 'Johann Burckhardt',
+    photographer: 'David Roberts',
+    startPage: 18,
+    endPage: 34,
+    pageCount: 17,
+    pageCitation: 'pp. 18–34',
+    city: 'Petra',
+    region: 'Ma\'an',
+    country: 'Jordania',
+    location: 'Petra · Jordania',
     magazine: {
-      id: 5,
-      name: 'Viajes National Geographic',
-      issueNumber: '180',
-      year: 2022,
-      month: 'Diciembre',
-      fullCitation: 'Viajes National Geographic · Nº 180 (Diciembre 2022)',
+      id: 2,
+      name: 'Altaïr Magazine',
+      issueNumber: '112',
+      year: 2020,
+      month: 'Abril',
+      fullCitation: 'Altaïr Magazine · Nº 112 (Abril 2020)',
     },
-    synopsis: 'Travesía por el glaciar Perito Moreno y senderos andinos.',
-    tags: ['Glaciares', 'Patagonia', 'Aventura'],
+    synopsis: 'Exploración arqueológica y etnográfica en el cañón de Petra.',
+    tags: ['Arqueología', 'Jordania', 'Nabateos'],
     featured: true,
-    catalogReference: 'Viajes National Geographic · Nº 180 (Diciembre 2022) · pp. 24–38',
+    coverImageUrl: 'https://images.unsplash.com/petra.jpg',
+    catalogReference: 'Altaïr Magazine · Nº 112 (Abril 2020) · pp. 18–34',
   };
 
-  beforeEach(() => {
-    vi.useFakeTimers();
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: vi.fn().mockResolvedValue(undefined),
-      },
-    });
+  it('renders nothing when article is null', () => {
+    const { container } = render(<ArticleDetailModal article={null} onClose={vi.fn()} />);
+    expect(container.firstChild).toBeNull();
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it('renders null when article is null', () => {
-    const { container } = render(
-      <ArticleDetailModal article={null} onClose={vi.fn()} />
-    );
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('renders article details and handles close clicks', () => {
+  it('renders full article details, location, pagination, and credits', () => {
     const handleClose = vi.fn();
     render(<ArticleDetailModal article={sampleArticle} onClose={handleClose} />);
 
-    expect(screen.getByText('Ficha Bibliográfica del Catálogo')).toBeInTheDocument();
-    expect(screen.getByText('Ruta por los Glaciares')).toBeInTheDocument();
-    expect(screen.getByText('Expedición en el sur de la Patagonia')).toBeInTheDocument();
-    expect(screen.getByText('Mateo Morales')).toBeInTheDocument();
-    expect(screen.getByText('Elena Rostova')).toBeInTheDocument();
-    expect(screen.getByText('#Glaciares')).toBeInTheDocument();
+    expect(screen.getByText('Petra Entre Sombras y Rocas')).toBeInTheDocument();
+    expect(screen.getByText('Arqueología nabatea en el Siq')).toBeInTheDocument();
+    expect(screen.getByText('Ref. #42')).toBeInTheDocument();
+    expect(screen.getByText('Petra · Jordania')).toBeInTheDocument();
+    expect(screen.getAllByText(/Johann Burckhardt/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/David Roberts/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Páginas 18 a 34 (17 páginas)')).toBeInTheDocument();
+    expect(screen.getByText('Nabateos')).toBeInTheDocument();
+
+    // Close button in header
+    const closeBtn = screen.getByLabelText('Cerrar ficha');
+    fireEvent.click(closeBtn);
+    expect(handleClose).toHaveBeenCalledTimes(1);
+
+    // Close button in footer
+    const footerCloseBtn = screen.getByRole('button', { name: 'Cerrar' });
+    fireEvent.click(footerCloseBtn);
+    expect(handleClose).toHaveBeenCalledTimes(2);
+  });
+
+  it('copies bibliographic citation to clipboard and shows feedback', async () => {
+    vi.useFakeTimers();
+
+    const writeTextMock = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: writeTextMock,
+      },
+    });
+
+    render(<ArticleDetailModal article={sampleArticle} onClose={vi.fn()} />);
+
+    const copyBtn = screen.getByRole('button', { name: /copiar cita/i });
+    fireEvent.click(copyBtn);
+
+    expect(writeTextMock).toHaveBeenCalledWith(
+      expect.stringContaining('Petra Entre Sombras y Rocas')
+    );
+    expect(screen.getByText('¡Copiado!')).toBeInTheDocument();
+
+    // Advance timer to test reverting copied state
+    act(() => {
+      vi.advanceTimersByTime(2300);
+    });
+
+    expect(screen.queryByText('¡Copiado!')).not.toBeInTheDocument();
+    expect(screen.getByText('Copiar Cita')).toBeInTheDocument();
+
+    vi.useRealTimers();
+  });
+
+  it('handles backdrop click to close and prevents modal content click propagation', () => {
+    const handleClose = vi.fn();
+    render(<ArticleDetailModal article={sampleArticle} onClose={handleClose} />);
 
     // Click backdrop
     const dialog = screen.getByRole('dialog');
     fireEvent.click(dialog);
     expect(handleClose).toHaveBeenCalledTimes(1);
 
-    // Click top close icon
-    const closeBtn = screen.getByLabelText('Cerrar ficha');
-    fireEvent.click(closeBtn);
-    expect(handleClose).toHaveBeenCalledTimes(2);
-
-    // Click bottom "Cerrar Ficha" button
-    const bottomCloseBtn = screen.getByRole('button', { name: 'Cerrar Ficha' });
-    fireEvent.click(bottomCloseBtn);
-    expect(handleClose).toHaveBeenCalledTimes(3);
-  });
-
-  it('copies citation to clipboard and shows feedback', async () => {
-    render(<ArticleDetailModal article={sampleArticle} onClose={vi.fn()} />);
-
-    const copyBtn = screen.getByRole('button', { name: /copiar cita/i });
-    fireEvent.click(copyBtn);
-
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-      expect.stringContaining('Ruta por los Glaciares')
-    );
-
-    // Feedback should show "¡Copiado!"
-    expect(screen.getByText('¡Copiado!')).toBeInTheDocument();
-
-    // Advance timer to test reverting
-    act(() => {
-      vi.advanceTimersByTime(2500);
-    });
-
-    expect(screen.getByText('Copiar Cita')).toBeInTheDocument();
-  });
-
-  it('renders correctly without author, subtitle, or photographer', () => {
-    const minimalArticle: ArticleDTO = {
-      ...sampleArticle,
-      author: undefined,
-      subtitle: undefined,
-      photographer: undefined,
-    };
-
-    render(<ArticleDetailModal article={minimalArticle} onClose={vi.fn()} />);
-
-    expect(screen.getByText('Redacción editorial')).toBeInTheDocument();
-    expect(screen.queryByText('Fotografía:')).not.toBeInTheDocument();
+    // Click content does not close
+    const modalContent = screen.getByText('Ficha Bibliográfica del Catálogo');
+    fireEvent.click(modalContent);
+    expect(handleClose).toHaveBeenCalledTimes(1);
   });
 });

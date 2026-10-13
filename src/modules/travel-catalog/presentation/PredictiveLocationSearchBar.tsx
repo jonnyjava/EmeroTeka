@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Search,
-  MapPin,
   Globe,
   Compass,
   X,
@@ -12,7 +11,7 @@ import {
   Calendar,
   Sparkles,
   ArrowRight,
-  Tag,
+  MapPin,
   Bookmark,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -27,7 +26,6 @@ export interface PredictiveLocationSearchBarProps {
   selectedYear?: number;
   onYearChange: (year?: number) => void;
   magazines: MagazineSummary[];
-  popularTopics?: string[];
   popularDestinations?: string[];
   totalResults: number;
   isLoading: boolean;
@@ -43,7 +41,6 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
   selectedYear,
   onYearChange,
   magazines,
-  popularTopics,
   popularDestinations,
   totalResults,
   isLoading,
@@ -56,11 +53,11 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
   const localInputRef = useRef<HTMLInputElement>(null);
   const activeInputRef = inputRef || localInputRef;
 
-  const topicsList = popularTopics || popularDestinations || [];
+  const destinationsList = popularDestinations || [];
 
   // Filter suggestions based on current query
-  const suggestions = topicsList.filter((topic) =>
-    topic.toLowerCase().includes(query.trim().toLowerCase())
+  const suggestions = destinationsList.filter((destination) =>
+    destination.toLowerCase().includes(query.trim().toLowerCase())
   );
 
   const showDropdown = isFocused && query.trim().length > 0 && suggestions.length > 0;
@@ -86,8 +83,8 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
     }
   };
 
-  const handleSelectTopic = (topic: string) => {
-    onQueryChange(topic);
+  const handleSelectDestination = (destination: string) => {
+    onQueryChange(destination);
     setIsFocused(false);
     if (activeInputRef.current) {
       activeInputRef.current.focus();
@@ -135,11 +132,11 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#1B275E] tracking-tight">
-            Localizador Predictivo por Temática y Destino
+            Localizador Predictivo por Destino y Geografía
           </h2>
 
           <p className="text-sm text-[#475569] mt-1.5 max-w-2xl leading-relaxed">
-            Escribe el nombre de cualquier temática, paraje o reportaje para descubrir la revista, volumen, año y páginas exactas de publicación.
+            Escribe el nombre de cualquier ciudad, país o reportaje para descubrir la revista, volumen, año y páginas exactas de publicación.
           </p>
         </div>
 
@@ -148,7 +145,7 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
             variant="ghost"
             size="sm"
             onClick={onReset}
-            className="self-start md:self-auto text-xs font-bold text-[#2A3E92] hover:text-[#1E2D69] hover:bg-[#EEF2FF] flex items-center gap-1.5 border border-[#CCD5EE] rounded-lg"
+            className="text-[#2A3E92] hover:text-[#1E2D69] hover:bg-[#EEF2FF] border border-[#CCD5EE] self-start md:self-auto font-bold text-xs gap-1.5 cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Restablecer búsqueda</span>
@@ -156,17 +153,14 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
         )}
       </div>
 
-      {/* Predictive Search Bar with St Tropaz #2A3E92 Focus States */}
+      {/* Main Form Area */}
       <div className="space-y-4">
+        {/* Predictive Search Input with Floating Autocomplete */}
         <div className="relative">
           <div className="relative flex items-center">
-            {/* Leading Icon: St Tropaz Accent */}
+            {/* Leading Magnifier Icon */}
             <div className="absolute left-4.5 pointer-events-none text-[#2A3E92]">
-              {isLoading ? (
-                <Compass className="w-5 h-5 animate-spin text-[#2A3E92]" />
-              ) : (
-                <Search className="w-5 h-5 text-[#2A3E92]" />
-              )}
+              <Search className="w-5 h-5 text-[#2A3E92]" />
             </div>
 
             <input
@@ -179,7 +173,7 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
               }}
               onFocus={() => setIsFocused(true)}
               onKeyDown={handleKeyDown}
-              placeholder="Buscar temática o destino (ej. Petra, Kioto, Arqueología, Svalbard, Positano, Altiplano)..."
+              placeholder="Buscar destino, ciudad o país (ej. Petra, Kioto, Svalbard, Positano, Altiplano)..."
               className="w-full pl-13 pr-32 py-4 bg-[#F8FAFC] hover:bg-white focus:bg-white border-2 border-[#CCD5EE] focus:border-[#2A3E92] rounded-xl text-base text-[#1B275E] placeholder:text-slate-400 font-medium transition-all shadow-xs focus:outline-hidden focus:ring-4 focus:ring-[#2A3E92]/15"
             />
 
@@ -216,7 +210,7 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
               <div className="px-4 py-2.5 bg-[#F8FAFC] border-b border-[#DCE2EE] flex items-center justify-between text-xs text-[#2A3E92] font-mono">
                 <span className="flex items-center gap-1.5 font-bold">
                   <Sparkles className="w-3.5 h-3.5 text-[#FFC72C]" />
-                  Temáticas coincidentes en el índice impreso
+                  Destinos coincidentes en el índice impreso
                 </span>
                 <span className="text-[11px] text-slate-500">
                   Usa ↑ ↓ para navegar · Enter para seleccionar
@@ -224,13 +218,13 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
               </div>
 
               <div className="max-h-60 overflow-y-auto divide-y divide-[#EEF2FF]">
-                {suggestions.map((topic, idx) => {
+                {suggestions.map((destination, idx) => {
                   const isHighlighted = idx === selectedIndex;
                   return (
                     <button
-                      key={topic}
+                      key={destination}
                       type="button"
-                      onClick={() => handleSelectTopic(topic)}
+                      onClick={() => handleSelectDestination(destination)}
                       className={`w-full text-left px-4 py-3 flex items-center justify-between transition-colors ${
                         isHighlighted
                           ? 'bg-[#2A3E92] text-white'
@@ -245,18 +239,18 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
                               : 'bg-[#EEF2FF] text-[#2A3E92]'
                           }`}
                         >
-                          <Tag className="w-4 h-4" />
+                          <MapPin className="w-4 h-4" />
                         </div>
                         <div>
                           <span className="font-semibold text-sm block">
-                            {topic}
+                            {destination}
                           </span>
                           <span
                             className={`text-xs block ${
                               isHighlighted ? 'text-white/80' : 'text-slate-500'
                             }`}
                           >
-                            Ver artículos indexados en el catálogo
+                            Ver artículos indexados en esta localización
                           </span>
                         </div>
                       </div>
@@ -344,27 +338,27 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
           </div>
         </div>
 
-        {/* Quick Topic Chips (St Tropaz & Lonely Planet pre-2022 Guidebook Index style) */}
+        {/* Quick Destination Chips */}
         <div className="pt-3.5 border-t-2 border-[#DCE2EE] flex flex-wrap items-center gap-2">
           <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] font-bold flex items-center gap-1.5 mr-1 shrink-0">
-            <Tag className="w-3.5 h-3.5 text-[#FFC72C]" />
-            Índice rápido:
+            <MapPin className="w-3.5 h-3.5 text-[#FFC72C]" />
+            Destinos clave:
           </span>
 
-          {topicsList.slice(0, 10).map((topic) => {
-            const isSelected = query.toLowerCase() === topic.toLowerCase();
+          {destinationsList.slice(0, 10).map((destination) => {
+            const isSelected = query.toLowerCase() === destination.toLowerCase();
             return (
               <button
-                key={topic}
+                key={destination}
                 type="button"
-                onClick={() => handleSelectTopic(topic)}
+                onClick={() => handleSelectDestination(destination)}
                 className={`text-xs px-3.5 py-1.5 rounded-md transition-all duration-150 whitespace-nowrap cursor-pointer font-medium ${
                   isSelected
                     ? 'bg-[#2A3E92] text-white shadow-sm ring-2 ring-[#2A3E92]/30 font-bold'
                     : 'bg-[#F8FAFC] hover:bg-[#EEF2FF] text-[#1B275E] border border-[#CCD5EE] hover:border-[#2A3E92] hover:text-[#2A3E92]'
                 }`}
               >
-                {topic}
+                {destination}
               </button>
             );
           })}

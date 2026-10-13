@@ -2,83 +2,65 @@ import { describe, it, expect, vi } from 'vitest';
 import { GetCatalogOverviewUseCase } from './GetCatalogOverviewUseCase.ts';
 import { IArticleRepository, MagazineSummary } from '../domain/IArticleRepository.ts';
 import { Article } from '../domain/Article.ts';
-import { Topic } from '../domain/Topic.ts';
 import { MagazineIssue } from '../domain/MagazineIssue.ts';
 
-describe('GetCatalogOverviewUseCase', () => {
-  it('orchestrates repository methods and returns formatted overview response', async () => {
-    const mockMagazines: MagazineSummary[] = [
-      {
-        id: 1,
-        name: 'National Geographic',
-        issuesCount: 120,
-        articlesCount: 450,
-      },
-      {
-        id: 2,
-        name: 'Altaïr',
-        issuesCount: 80,
-        articlesCount: 300,
-      },
-    ];
+describe('GetCatalogOverviewUseCase Application Service', () => {
+  const sampleMagazines: MagazineSummary[] = [
+    {
+      id: 1,
+      name: 'National Geographic',
+      issuesCount: 50,
+      articlesCount: 200,
+    },
+    {
+      id: 2,
+      name: 'Lonely Planet Magazine',
+      issuesCount: 30,
+      articlesCount: 120,
+    },
+  ];
 
-    const topic1 = Topic.create({ name: 'Kioto', category: 'Japón' });
-    const topic2 = Topic.create({ name: 'Petra', category: 'Jordania' });
+  const sampleIssue = MagazineIssue.create({
+    id: 1,
+    magazineId: 1,
+    magazineName: 'National Geographic',
+    issueNumber: '300',
+    year: 2020,
+  });
 
-    const issue = MagazineIssue.create({
-      id: 10,
-      magazineId: 1,
-      magazineName: 'National Geographic',
-      issueNumber: '400',
-      year: 2022,
-    });
+  const featuredArticle = Article.create({
+    id: 5,
+    title: 'Misterios de Kioto',
+    startPage: 12,
+    endPage: 28,
+    city: 'Kioto',
+    country: 'Japón',
+    issue: sampleIssue,
+    synopsis: 'Templos zen y jardines tradicionales de Kioto.',
+    featured: true,
+  });
 
-    const mockArticle = Article.create({
-      id: 99,
-      title: 'Jardines Zen de Kioto',
-      startPage: 14,
-      endPage: 28,
-      topic: topic1,
-      issue,
-      synopsis: 'Armonía y templos ancestrales en la capital cultural de Japón.',
-    });
-
+  it('orchestrates repository methods in parallel and returns structured catalog overview', async () => {
     const mockRepo: IArticleRepository = {
-      searchByTopic: vi.fn(),
+      getMagazines: vi.fn().mockResolvedValue(sampleMagazines),
+      findFeatured: vi.fn().mockResolvedValue([featuredArticle]),
+      getPopularDestinations: vi.fn().mockResolvedValue(['Kioto · Japón', 'Petra · Jordania']),
+      searchArticles: vi.fn(),
       findById: vi.fn(),
-      findFeatured: vi.fn().mockResolvedValue([mockArticle]),
-      getMagazines: vi.fn().mockResolvedValue(mockMagazines),
-      getPopularTopics: vi.fn().mockResolvedValue([topic1, topic2]),
     };
 
     const useCase = new GetCatalogOverviewUseCase(mockRepo);
     const result = await useCase.execute();
+
+    expect(result.magazines).toEqual(sampleMagazines);
+    expect(result.featuredArticles.length).toBe(1);
+    expect(result.featuredArticles[0].id).toBe(5);
+    expect(result.featuredArticles[0].title).toBe('Misterios de Kioto');
+    expect(result.featuredArticles[0].location).toBe('Kioto · Japón');
+    expect(result.popularDestinations).toEqual(['Kioto · Japón', 'Petra · Jordania']);
 
     expect(mockRepo.getMagazines).toHaveBeenCalledTimes(1);
     expect(mockRepo.findFeatured).toHaveBeenCalledWith(8);
-    expect(mockRepo.getPopularTopics).toHaveBeenCalledTimes(1);
-
-    expect(result.magazines).toEqual(mockMagazines);
-    expect(result.featuredArticles).toHaveLength(1);
-    expect(result.featuredArticles[0].id).toBe(99);
-    expect(result.featuredArticles[0].title).toBe('Jardines Zen de Kioto');
-    expect(result.popularTopics).toEqual(['Kioto · Japón', 'Petra · Jordania']);
-  });
-
-  it('handles empty results gracefully', async () => {
-    const mockRepo: IArticleRepository = {
-      searchByTopic: vi.fn(),
-      findById: vi.fn(),
-      findFeatured: vi.fn().mockResolvedValue([]),
-      getMagazines: vi.fn().mockResolvedValue([]),
-      getPopularTopics: vi.fn().mockResolvedValue([]),
-    };
-
-    const useCase = new GetCatalogOverviewUseCase(mockRepo);
-    const result = await useCase.execute();
-
-    expect(result.magazines).toEqual([]);
-    expect(result.featuredArticles).toEqual([]);
-    expect(result.popularTopics).toEqual([]);
+    expect(mockRepo.getPopularDestinations).toHaveBeenCalledTimes(1);
   });
 });

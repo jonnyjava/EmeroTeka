@@ -25,7 +25,7 @@ describe('LocationSearchBar Component', () => {
         selectedYear={2021}
         onYearChange={handleYearChange}
         magazines={sampleMagazines}
-        popularTopics={['Petra · Jordania', 'Kioto · Japón']}
+        popularDestinations={['Petra · Jordania', 'Kioto · Japón']}
         totalResults={5}
         isLoading={false}
         onReset={handleReset}
@@ -60,9 +60,9 @@ describe('LocationSearchBar Component', () => {
     fireEvent.change(yearSelect, { target: { value: '' } });
     expect(handleYearChange).toHaveBeenCalledWith(undefined);
 
-    // Click quick topic
-    const topicBtn = screen.getByRole('button', { name: 'Kioto · Japón' });
-    fireEvent.click(topicBtn);
+    // Click quick destination
+    const destinationBtn = screen.getByRole('button', { name: 'Kioto · Japón' });
+    fireEvent.click(destinationBtn);
     expect(handleQueryChange).toHaveBeenCalledWith('Kioto · Japón');
 
     // Click reset button
@@ -71,7 +71,7 @@ describe('LocationSearchBar Component', () => {
     expect(handleReset).toHaveBeenCalledTimes(1);
   });
 
-  it('displays loading state indicator and handles popularDestinations fallback', () => {
+  it('displays loading state indicator and handles empty destinations gracefully', () => {
     render(
       <LocationSearchBar
         query=""
@@ -79,7 +79,6 @@ describe('LocationSearchBar Component', () => {
         onMagazineChange={vi.fn()}
         onYearChange={vi.fn()}
         magazines={[]}
-        popularDestinations={['Cusco · Perú']}
         totalResults={0}
         isLoading={true}
         onReset={vi.fn()}
@@ -87,28 +86,10 @@ describe('LocationSearchBar Component', () => {
     );
 
     expect(screen.getByText('...')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Cusco · Perú' })).toBeInTheDocument();
     expect(screen.queryByText('Restablecer')).not.toBeInTheDocument();
   });
 
-  it('handles empty fallback when neither popularTopics nor popularDestinations are provided', () => {
-    render(
-      <LocationSearchBar
-        query=""
-        onQueryChange={vi.fn()}
-        onMagazineChange={vi.fn()}
-        onYearChange={vi.fn()}
-        magazines={[]}
-        totalResults={0}
-        isLoading={false}
-        onReset={vi.fn()}
-      />
-    );
-
-    expect(screen.getByText('0 resultados')).toBeInTheDocument();
-  });
-
-  it('highlights topic button when query matches topic name', () => {
+  it('highlights destination button when query matches destination name', () => {
     render(
       <LocationSearchBar
         query="Cusco · Perú"
@@ -116,7 +97,7 @@ describe('LocationSearchBar Component', () => {
         onMagazineChange={vi.fn()}
         onYearChange={vi.fn()}
         magazines={[]}
-        popularTopics={['Cusco · Perú', 'Roma · Italia']}
+        popularDestinations={['Cusco · Perú', 'Roma · Italia']}
         totalResults={1}
         isLoading={false}
         onReset={vi.fn()}

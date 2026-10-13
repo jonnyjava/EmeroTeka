@@ -7,7 +7,7 @@ describe('PredictiveLocationSearchBar Component', () => {
   const sampleMagazines = [
     { id: 1, name: 'National Geographic', issuesCount: 15, articlesCount: 60 },
   ];
-  const sampleTopics = ['Petra · Jordania', 'Kioto · Japón', 'Patagonia · Argentina'];
+  const sampleDestinations = ['Petra · Jordania', 'Kioto · Japón', 'Patagonia · Argentina'];
 
   it('renders input, handles typing, and opens predictive dropdown', () => {
     const handleQueryChange = vi.fn();
@@ -18,7 +18,7 @@ describe('PredictiveLocationSearchBar Component', () => {
         query="Pet"
         onQueryChange={handleQueryChange}
         magazines={sampleMagazines}
-        popularTopics={sampleTopics}
+        popularDestinations={sampleDestinations}
         totalResults={1}
         isLoading={false}
         onReset={vi.fn()}
@@ -26,7 +26,7 @@ describe('PredictiveLocationSearchBar Component', () => {
       />
     );
 
-    const input = screen.getByPlaceholderText(/buscar temática o destino/i);
+    const input = screen.getByPlaceholderText(/buscar destino, ciudad o país/i);
 
     // Focus input to show predictive dropdown
     fireEvent.focus(input);
@@ -47,14 +47,14 @@ describe('PredictiveLocationSearchBar Component', () => {
         query="P"
         onQueryChange={handleQueryChange}
         magazines={sampleMagazines}
-        popularTopics={sampleTopics}
+        popularDestinations={sampleDestinations}
         totalResults={2}
         isLoading={false}
         onReset={vi.fn()}
       />
     );
 
-    const input = screen.getByPlaceholderText(/buscar temática o destino/i);
+    const input = screen.getByPlaceholderText(/buscar destino, ciudad o país/i);
     fireEvent.focus(input);
 
     // Navigate with ArrowDown to end and wrap around
@@ -73,9 +73,9 @@ describe('PredictiveLocationSearchBar Component', () => {
 
     // Test Escape key closes dropdown
     fireEvent.focus(input);
-    expect(screen.getByText('Temáticas coincidentes en el índice impreso')).toBeInTheDocument();
+    expect(screen.getByText('Destinos coincidentes en el índice impreso')).toBeInTheDocument();
     fireEvent.keyDown(input, { key: 'Escape' });
-    expect(screen.queryByText('Temáticas coincidentes en el índice impreso')).not.toBeInTheDocument();
+    expect(screen.queryByText('Destinos coincidentes en el índice impreso')).not.toBeInTheDocument();
   });
 
   it('handles clearing search query and outside click', () => {
@@ -93,7 +93,7 @@ describe('PredictiveLocationSearchBar Component', () => {
           selectedYear={2022}
           onYearChange={vi.fn()}
           magazines={sampleMagazines}
-          popularTopics={sampleTopics}
+          popularDestinations={sampleDestinations}
           totalResults={3}
           isLoading={false}
           onReset={handleReset}
@@ -101,15 +101,15 @@ describe('PredictiveLocationSearchBar Component', () => {
       </div>
     );
 
-    const input = screen.getByPlaceholderText(/buscar temática o destino/i);
+    const input = screen.getByPlaceholderText(/buscar destino, ciudad o país/i);
     fireEvent.focus(input);
 
     // Dropdown should be open
-    expect(screen.getByText('Temáticas coincidentes en el índice impreso')).toBeInTheDocument();
+    expect(screen.getByText('Destinos coincidentes en el índice impreso')).toBeInTheDocument();
 
     // Click outside to close dropdown
     fireEvent.mouseDown(screen.getByTestId('outside'));
-    expect(screen.queryByText('Temáticas coincidentes en el índice impreso')).not.toBeInTheDocument();
+    expect(screen.queryByText('Destinos coincidentes en el índice impreso')).not.toBeInTheDocument();
 
     // Clear input button
     const clearBtn = screen.getByLabelText('Limpiar campo');
@@ -133,7 +133,7 @@ describe('PredictiveLocationSearchBar Component', () => {
         onMagazineChange={handleMagazineChange}
         onYearChange={handleYearChange}
         magazines={sampleMagazines}
-        popularTopics={sampleTopics}
+        popularDestinations={sampleDestinations}
         totalResults={0}
         isLoading={true}
         onReset={vi.fn()}
@@ -159,14 +159,14 @@ describe('PredictiveLocationSearchBar Component', () => {
     expect(handleYearChange).toHaveBeenCalledWith(undefined);
   });
 
-  it('selects quick topic chip from bottom chips section', () => {
+  it('selects quick destination chip from bottom chips section', () => {
     const handleQueryChange = vi.fn();
     render(
       <PredictiveLocationSearchBar
         query=""
         onQueryChange={handleQueryChange}
         magazines={sampleMagazines}
-        popularTopics={sampleTopics}
+        popularDestinations={sampleDestinations}
         totalResults={3}
         isLoading={false}
         onReset={vi.fn()}
@@ -187,7 +187,7 @@ describe('PredictiveLocationSearchBar Component', () => {
         query="Kioto · Japón"
         onQueryChange={handleQueryChange}
         magazines={sampleMagazines}
-        popularTopics={sampleTopics}
+        popularDestinations={sampleDestinations}
         totalResults={1}
         isLoading={false}
         onReset={vi.fn()}
@@ -198,7 +198,7 @@ describe('PredictiveLocationSearchBar Component', () => {
     // Singular result label
     expect(screen.getByText('1 artículo')).toBeInTheDocument();
 
-    const input = screen.getByPlaceholderText(/buscar temática o destino/i);
+    const input = screen.getByPlaceholderText(/buscar destino, ciudad o país/i);
     fireEvent.focus(input);
 
     // Press Enter when selectedIndex is -1

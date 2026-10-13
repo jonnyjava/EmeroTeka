@@ -1,5 +1,4 @@
 import { Article } from '../domain/Article.ts';
-import { Topic } from '../domain/Topic.ts';
 import { MagazineIssue } from '../domain/MagazineIssue.ts';
 
 export interface RawDatabaseArticleJoined {
@@ -48,14 +47,7 @@ export class ArticleMapper {
    * Maps a relational database row with joins into a domain Article Aggregate Root.
    */
   public static toDomain(raw: RawDatabaseArticleJoined): Article {
-    // 1. Build Topic Value Object
-    const topic = Topic.create({
-      name: raw.article.city || raw.article.country,
-      subtopic: raw.article.region,
-      category: raw.article.country,
-    });
-
-    // 2. Build MagazineIssue Domain Entity
+    // 1. Build MagazineIssue Domain Entity
     const issue = MagazineIssue.create({
       id: raw.issue.id,
       magazineId: raw.magazine.id,
@@ -68,12 +60,12 @@ export class ArticleMapper {
       coverImageUrl: raw.issue.coverImageUrl || raw.magazine.coverImageUrl,
     });
 
-    // 3. Parse tags
+    // 2. Parse tags
     const tagsArray = raw.article.tags
-      ? raw.article.tags.split(',').map(t => t.trim()).filter(Boolean)
+      ? raw.article.tags.split(',').map((t) => t.trim()).filter(Boolean)
       : [];
 
-    // 4. Build Article Aggregate Root
+    // 3. Build Article Aggregate Root
     return Article.create({
       id: raw.article.id,
       title: raw.article.title,
@@ -82,12 +74,15 @@ export class ArticleMapper {
       photographer: raw.article.photographer,
       startPage: raw.article.startPage,
       endPage: raw.article.endPage,
-      topic,
+      city: raw.article.city,
+      region: raw.article.region,
+      country: raw.article.country,
       issue,
       synopsis: raw.article.synopsis,
       tags: tagsArray,
       featured: raw.article.featured ?? false,
-      coverImageUrl: raw.article.coverImageUrl || raw.issue.coverImageUrl || raw.magazine.coverImageUrl,
+      coverImageUrl:
+        raw.article.coverImageUrl || raw.issue.coverImageUrl || raw.magazine.coverImageUrl,
       createdAt: raw.article.createdAt,
     });
   }

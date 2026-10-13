@@ -15,14 +15,12 @@ import { Compass, BookOpen, Layers, Search, Sparkles, MapPin, Bookmark } from 'l
 interface TravelCatalogAppProps {
   initialMagazines: MagazineSummary[];
   initialArticles: ArticleDTO[];
-  initialTopics?: string[];
   initialDestinations?: string[];
 }
 
 export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
   initialMagazines,
   initialArticles,
-  initialTopics,
   initialDestinations,
 }) => {
   const [query, setQuery] = useState('');
@@ -105,7 +103,7 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
           </h1>
 
           <p className="text-base sm:text-lg text-[#475569] max-w-2xl mx-auto leading-relaxed">
-            Descubre con precisión milimétrica en qué revista, año, número y páginas se publicaron crónicas, mapas y reportajes de autor sobre cualquier temática o rincón del planeta.
+            Descubre con precisión milimétrica en qué revista, año, número y páginas se publicaron crónicas, mapas y reportajes de autor sobre cualquier destino o rincón del planeta.
           </p>
 
           {/* Guidebook Stats Strip (Pre-2022 LP Chapter Index Style) */}
@@ -137,7 +135,7 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
           selectedYear={selectedYear}
           onYearChange={setSelectedYear}
           magazines={initialMagazines}
-          popularTopics={initialTopics || initialDestinations}
+          popularDestinations={initialDestinations}
           totalResults={articles.length}
           isLoading={isSearching}
           onReset={handleResetFilters}
@@ -179,7 +177,7 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
           />
         </section>
 
-        {/* Magazine Showcase Grid */}
+        {/* 3) Magazine Collection Archive Showcase */}
         <MagazineShowcase
           magazines={initialMagazines}
           selectedMagazineId={selectedMagazineId}
@@ -190,39 +188,47 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
         />
       </main>
 
-      {/* Modals */}
+      {/* Bibliographic Article Detail Modal */}
       <ArticleDetailModal
         article={selectedArticle}
         onClose={() => setSelectedArticle(null)}
       />
 
+      {/* Clean Architecture / DDD Educational Modal */}
       <ArchitectureInfoModal
         isOpen={isArchitectureOpen}
         onClose={() => setIsArchitectureOpen(false)}
       />
 
-      {/* Editorial Footer (Lonely Planet Guide Colophon Style) */}
-      <footer className="mt-20 border-t-2 border-[#DCE2EE] bg-white py-8 px-4 sm:px-6 lg:px-8 text-xs text-[#475569] font-mono">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 bg-[#2A3E92] rounded-xs inline-block" />
-            <span className="font-bold text-[#1B275E]">Archivia Viaggi</span>
-            <span>·</span>
-            <span>Catálogo Bibliográfico de Revistas de Viajes</span>
-            <span className="hidden md:inline bg-[#EEF2FF] text-[#2A3E92] font-semibold px-2 py-0.5 rounded border border-[#CCD5EE] text-[10px]">
-              Tipografía NatGeo (Geograph & Caslon) · St Tropaz #2A3E92
-            </span>
+      {/* Footer in Editorial Deep St Tropaz Blue */}
+      <footer className="bg-[#141E46] text-white border-t-4 border-[#FFC72C] py-12 px-4 sm:px-6 lg:px-8 mt-16">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#2A3E92] rounded-lg border border-white/20">
+              <Compass className="w-5 h-5 text-[#FFC72C]" />
+            </div>
+            <div>
+              <span className="font-display text-lg font-bold tracking-wider uppercase block text-white">
+                Archivia Viaggi
+              </span>
+              <span className="text-xs text-slate-400 font-mono">
+                Catálogo Histórico Bibliográfico de Revistas de Viajes
+              </span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-300 font-mono">
+            <span>Next.js 15 App Router</span>
+            <span>·</span>
+            <span>Clean Architecture / DDD</span>
+            <span>·</span>
             <button
               type="button"
               onClick={() => setIsArchitectureOpen(true)}
-              className="text-[#2A3E92] hover:text-[#1E2D69] font-bold underline transition-colors cursor-pointer"
+              className="text-[#FFC72C] hover:underline cursor-pointer font-bold"
             >
               Arquitectura DDD & Capas
             </button>
-            <span className="text-[#1B275E] font-medium">PostgreSQL en Google Cloud SQL</span>
           </div>
         </div>
       </footer>

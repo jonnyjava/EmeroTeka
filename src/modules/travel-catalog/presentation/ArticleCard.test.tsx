@@ -4,91 +4,86 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { ArticleCard } from './ArticleCard.tsx';
 import { ArticleDTO } from '../domain/Article.ts';
 
-// Mock next/image to render standard img tag
+// Mock next/image
 vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt, onError, ...props }: any) => (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={src} alt={alt} onError={onError} {...props} data-testid="next-image" />
+    <img
+      src={src}
+      alt={alt}
+      onError={onError}
+      {...props}
+      data-testid="article-image"
+    />
   ),
 }));
 
 describe('ArticleCard Component', () => {
-  const baseArticle: ArticleDTO = {
+  const sampleArticle: ArticleDTO = {
     id: 1,
-    title: 'Misterios de Kioto',
-    subtitle: 'Templos y jardines secretos',
-    author: 'Kenji Sato',
-    photographer: 'Hiroshi T.',
-    startPage: 14,
-    endPage: 28,
+    title: 'Navegando el Nilo',
+    subtitle: 'De Lúxor a Asuán en falúa tradicional',
+    author: 'Howard Carter',
+    photographer: 'Harry Burton',
+    startPage: 24,
+    endPage: 38,
     pageCount: 15,
-    pageCitation: 'pp. 14–28',
-    topic: {
-      name: 'Kioto',
-      category: 'Japón',
-      subtopic: 'Kansai',
-      formatted: 'Kioto · Kansai · Japón',
-    },
+    pageCitation: 'pp. 24–38',
+    city: 'Lúxor',
+    region: 'Alto Egipto',
+    country: 'Egipto',
+    location: 'Lúxor · Egipto',
     magazine: {
       id: 1,
       name: 'National Geographic',
-      issueNumber: '210',
-      year: 2021,
-      month: 'Abril',
-      fullCitation: 'National Geographic · Nº 210 (Abril 2021)',
-      coverImageUrl: 'https://images.example.com/cover.jpg',
+      issueNumber: '290',
+      year: 2019,
+      month: 'Octubre',
+      fullCitation: 'National Geographic · Nº 290 (Octubre 2019)',
     },
-    synopsis: 'Un viaje contemplativo por los santuarios de Kioto.',
-    tags: ['Templos', 'Japón'],
+    synopsis: 'Crónica del descubrimiento de tumbas y navegación fluvial en Egipto.',
+    tags: ['Egipto', 'Arqueología', 'Nilo'],
     featured: true,
-    coverImageUrl: 'https://images.example.com/article.jpg',
-    catalogReference: 'National Geographic · Nº 210 (Abril 2021) · pp. 14–28',
+    coverImageUrl: 'https://images.unsplash.com/nile.jpg',
+    catalogReference: 'National Geographic · Nº 290 (Octubre 2019) · pp. 24–38',
   };
 
-  it('renders article card with image, title, author, topic, and handles click', () => {
+  it('renders article card with title, author, citation, and location badge', () => {
     const handleSelect = vi.fn();
-    render(<ArticleCard article={baseArticle} onSelect={handleSelect} />);
+    render(<ArticleCard article={sampleArticle} onSelect={handleSelect} />);
 
-    expect(screen.getByText('Misterios de Kioto')).toBeInTheDocument();
-    expect(screen.getByText('Templos y jardines secretos')).toBeInTheDocument();
-    expect(screen.getByText('Kenji Sato')).toBeInTheDocument();
-    expect(screen.getByText('Kioto · Kansai · Japón')).toBeInTheDocument();
-    expect(screen.getByText('pp. 14–28')).toBeInTheDocument();
-    expect(screen.getByText('National Geographic')).toBeInTheDocument();
+    expect(screen.getByText('Navegando el Nilo')).toBeInTheDocument();
+    expect(screen.getByText('De Lúxor a Asuán en falúa tradicional')).toBeInTheDocument();
+    expect(screen.getByText('Howard Carter')).toBeInTheDocument();
+    expect(screen.getByText('Lúxor · Egipto')).toBeInTheDocument();
+    expect(screen.getByText('pp. 24–38')).toBeInTheDocument();
+    expect(screen.getByText('Nº 290')).toBeInTheDocument();
 
     const card = screen.getByRole('article');
     fireEvent.click(card);
-    expect(handleSelect).toHaveBeenCalledWith(baseArticle);
+    expect(handleSelect).toHaveBeenCalledWith(sampleArticle);
   });
 
-  it('displays fallback initials when image triggers onError', () => {
-    const handleSelect = vi.fn();
-    render(<ArticleCard article={baseArticle} onSelect={handleSelect} />);
-
-    const img = screen.getByTestId('next-image');
-    fireEvent.error(img);
-
-    // Magazine initials for "National Geographic" -> "NG"
-    expect(screen.getByText('NG')).toBeInTheDocument();
-  });
-
-  it('displays fallback initials and editorial author fallback when fields are missing', () => {
-    const articleWithoutAuthorAndImage: ArticleDTO = {
-      ...baseArticle,
-      subtitle: undefined,
-      author: undefined,
+  it('falls back to magazine initials when cover image is absent or fails to load', () => {
+    const noImageArticle: ArticleDTO = {
+      ...sampleArticle,
       coverImageUrl: undefined,
-      magazine: {
-        ...baseArticle.magazine,
-        name: 'Lonely Planet',
-      },
+      author: undefined,
+      subtitle: undefined,
     };
 
-    render(<ArticleCard article={articleWithoutAuthorAndImage} onSelect={vi.fn()} />);
+    const { rerender } = render(<ArticleCard article={noImageArticle} onSelect={vi.fn()} />);
 
+    // Shows NG initials fallback
+    expect(screen.getByText('NG')).toBeInTheDocument();
     expect(screen.getByText('Redacción editorial')).toBeInTheDocument();
-    // Initials for "Lonely Planet" -> "LP"
-    expect(screen.getByText('LP')).toBeInTheDocument();
+
+    // Rerender with image and simulate error
+    rerender(<ArticleCard article={sampleArticle} onSelect={vi.fn()} />);
+    const img = screen.getByTestId('article-image');
+    fireEvent.error(img);
+
+    expect(screen.getByText('NG')).toBeInTheDocument();
   });
 });

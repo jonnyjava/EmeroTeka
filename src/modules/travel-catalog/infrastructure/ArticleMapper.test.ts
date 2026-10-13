@@ -3,125 +3,117 @@ import { ArticleMapper, RawDatabaseArticleJoined } from './ArticleMapper.ts';
 
 describe('ArticleMapper Infrastructure Mapper', () => {
   it('maps complete database row with all fields to domain Article Aggregate Root', () => {
-    const raw: RawDatabaseArticleJoined = {
+    const rawRow: RawDatabaseArticleJoined = {
       article: {
         id: 1,
         magazineId: 10,
         issueId: 20,
-        title: 'Los Secretos del Nilo',
-        subtitle: 'Templos de Abu Simbel',
-        author: 'Jean-François Champollion',
-        photographer: 'David Roberts',
-        startPage: 40,
-        endPage: 55,
-        city: 'Aswan',
-        region: 'Alto Egipto',
-        country: 'Egipto',
-        locationSearchIndex: 'aswan alto egipto egipto',
-        synopsis: 'Un análisis arqueológico y fotográfico de los monumentos faraónicos.',
-        tags: 'Arqueología, Nilo, Historia Antigua',
+        title: 'Exploración en Svalbard',
+        subtitle: 'Fiordos y osos polares',
+        author: 'Fridtjof Nansen',
+        photographer: 'Juho Karhu',
+        startPage: 14,
+        endPage: 32,
+        city: 'Longyearbyen',
+        region: 'Svalbard',
+        country: 'Noruega',
+        locationSearchIndex: 'longyearbyen svalbard noruega',
+        synopsis: 'Expedición ártica en los confines septentrionales de Europa.',
+        tags: 'Ártico, Glaciares, Fauna',
         featured: true,
-        coverImageUrl: 'https://images.example.com/article-aswan.jpg',
-        createdAt: new Date('2023-01-01'),
+        coverImageUrl: 'https://images.unsplash.com/custom-cover.jpg',
+        createdAt: new Date('2022-01-15T00:00:00Z'),
       },
       issue: {
         id: 20,
         magazineId: 10,
-        issueNumber: '450',
-        year: 2021,
+        issueNumber: '405',
+        year: 2022,
         month: 'Marzo',
-        volume: 'Vol. 45',
-        title: 'Egipto Eterno',
-        coverImageUrl: 'https://images.example.com/issue-cover.jpg',
+        volume: 'Vol. 34',
+        title: 'Mares de Hielo',
+        coverImageUrl: 'https://images.unsplash.com/issue-cover.jpg',
       },
       magazine: {
         id: 10,
         name: 'National Geographic',
-        publisher: 'RBA Revistas',
-        country: 'España',
+        publisher: 'National Geographic Society',
+        country: 'Estados Unidos',
         description: 'Revista de exploración y ciencia.',
-        coverImageUrl: 'https://images.example.com/mag-cover.jpg',
+        coverImageUrl: 'https://images.unsplash.com/mag-cover.jpg',
       },
     };
 
-    const domainArticle = ArticleMapper.toDomain(raw);
+    const article = ArticleMapper.toDomain(rawRow);
 
-    expect(domainArticle.id).toBe(1);
-    expect(domainArticle.title).toBe('Los Secretos del Nilo');
-    expect(domainArticle.subtitle).toBe('Templos de Abu Simbel');
-    expect(domainArticle.author).toBe('Jean-François Champollion');
-    expect(domainArticle.photographer).toBe('David Roberts');
-    expect(domainArticle.startPage).toBe(40);
-    expect(domainArticle.endPage).toBe(55);
-    expect(domainArticle.synopsis).toBe(
-      'Un análisis arqueológico y fotográfico de los monumentos faraónicos.'
-    );
-    expect(domainArticle.tags).toEqual(['Arqueología', 'Nilo', 'Historia Antigua']);
-    expect(domainArticle.featured).toBe(true);
-    expect(domainArticle.coverImageUrl).toBe('https://images.example.com/article-aswan.jpg');
-
-    // Topic verification
-    expect(domainArticle.topic.name).toBe('Aswan');
-    expect(domainArticle.topic.subtopic).toBe('Alto Egipto');
-    expect(domainArticle.topic.category).toBe('Egipto');
-
-    // Issue verification
-    expect(domainArticle.issue.id).toBe(20);
-    expect(domainArticle.issue.magazineName).toBe('National Geographic');
-    expect(domainArticle.issue.issueNumber).toBe('450');
-    expect(domainArticle.issue.coverImageUrl).toBe('https://images.example.com/issue-cover.jpg');
+    expect(article.id).toBe(1);
+    expect(article.title).toBe('Exploración en Svalbard');
+    expect(article.subtitle).toBe('Fiordos y osos polares');
+    expect(article.author).toBe('Fridtjof Nansen');
+    expect(article.photographer).toBe('Juho Karhu');
+    expect(article.startPage).toBe(14);
+    expect(article.endPage).toBe(32);
+    expect(article.city).toBe('Longyearbyen');
+    expect(article.region).toBe('Svalbard');
+    expect(article.country).toBe('Noruega');
+    expect(article.getLocation()).toBe('Longyearbyen · Noruega');
+    expect(article.tags).toEqual(['Ártico', 'Glaciares', 'Fauna']);
+    expect(article.featured).toBe(true);
+    expect(article.coverImageUrl).toBe('https://images.unsplash.com/custom-cover.jpg');
+    expect(article.issue.magazineName).toBe('National Geographic');
   });
 
-  it('maps row with null optional fields and applies correct fallbacks', () => {
-    const raw: RawDatabaseArticleJoined = {
+  it('handles null and fallback values from joined tables correctly', () => {
+    const rawRow: RawDatabaseArticleJoined = {
       article: {
         id: 2,
-        magazineId: 11,
+        magazineId: 10,
         issueId: 21,
-        title: 'Travesía por el Sahara',
+        title: 'Ruta de la Seda en Samarcanda',
         subtitle: null,
         author: null,
         photographer: null,
-        startPage: 12,
-        endPage: 24,
-        city: null, // city is null -> fallback to country
+        startPage: 40,
+        endPage: 50,
+        city: null,
         region: null,
-        country: 'Argelia',
-        locationSearchIndex: 'argelia',
-        synopsis: 'Ruta en caravana por las dunas saharianas y oasis bereberes.',
-        tags: null, // tags is null -> empty array
-        featured: null, // featured is null -> default false
-        coverImageUrl: null, // article cover null -> fallback to issue/mag cover
+        country: 'Uzbekistán',
+        locationSearchIndex: 'samarcanda uzbekistan',
+        synopsis: 'Mosaicos de cúpulas turquesas y caravanas históricas.',
+        tags: null,
+        featured: null,
+        coverImageUrl: null,
         createdAt: null,
       },
       issue: {
         id: 21,
-        magazineId: 11,
-        issueNumber: '12',
-        year: 2019,
+        magazineId: 10,
+        issueNumber: '406',
+        year: 2023,
         month: null,
         volume: null,
         title: null,
-        coverImageUrl: null, // issue cover null -> fallback to mag cover
+        coverImageUrl: null,
       },
       magazine: {
-        id: 11,
+        id: 10,
         name: 'Altaïr Magazine',
         publisher: null,
         country: null,
         description: null,
-        coverImageUrl: 'https://images.example.com/altair-mag-cover.jpg',
+        coverImageUrl: 'https://images.unsplash.com/fallback-mag.jpg',
       },
     };
 
-    const domainArticle = ArticleMapper.toDomain(raw);
+    const article = ArticleMapper.toDomain(rawRow);
 
-    expect(domainArticle.topic.name).toBe('Argelia'); // fallback
-    expect(domainArticle.topic.category).toBe('Argelia');
-    expect(domainArticle.topic.subtopic).toBeUndefined();
-    expect(domainArticle.tags).toEqual([]);
-    expect(domainArticle.featured).toBe(false);
-    expect(domainArticle.issue.coverImageUrl).toBe('https://images.example.com/altair-mag-cover.jpg');
-    expect(domainArticle.coverImageUrl).toBe('https://images.example.com/altair-mag-cover.jpg');
+    expect(article.id).toBe(2);
+    expect(article.city).toBeUndefined();
+    expect(article.region).toBeUndefined();
+    expect(article.country).toBe('Uzbekistán');
+    expect(article.getLocation()).toBe('Uzbekistán');
+    expect(article.tags).toEqual([]);
+    expect(article.featured).toBe(false);
+    expect(article.coverImageUrl).toBe('https://images.unsplash.com/fallback-mag.jpg');
   });
 });

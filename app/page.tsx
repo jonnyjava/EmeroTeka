@@ -14,7 +14,7 @@ export default async function Page() {
     <TravelCatalogApp
       initialMagazines={overview.magazines}
       initialArticles={initialSearch.articles}
-      initialTopics={overview.popularTopics}
+      initialDestinations={overview.popularDestinations}
     />
   );
 }

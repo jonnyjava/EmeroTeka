@@ -4,18 +4,17 @@ import { articles, magazineIssues, magazines } from '../../../db/schema.ts';
 import {
   IArticleRepository,
   MagazineSummary,
-  SearchTopicFilter,
+  SearchArticlesFilter,
   SearchResult,
 } from '../domain/IArticleRepository.ts';
 import { Article } from '../domain/Article.ts';
-import { Topic } from '../domain/Topic.ts';
 import { ArticleMapper } from './ArticleMapper.ts';
 
 export class PostgresArticleRepository implements IArticleRepository {
   /**
-   * Search articles by topic (subject, theme, category, or keyword)
+   * Search articles by destination, location, title, or keywords
    */
-  public async searchByTopic(filter: SearchTopicFilter): Promise<SearchResult> {
+  public async searchArticles(filter: SearchArticlesFilter): Promise<SearchResult> {
     try {
       const conditions = [];
 
@@ -60,28 +59,28 @@ export class PostgresArticleRepository implements IArticleRepository {
         .limit(filter.limit || 20)
         .offset(filter.offset || 0);
 
-      // Total count query for pagination
-      const countRes = await db
-        .select({ count: sql<number>`cast(count(*) as int)` })
+      // Query total count for pagination metadata
+      const countResult = await db
+        .select({ count: sql<number>`count(*)` })
         .from(articles)
         .innerJoin(magazineIssues, eq(articles.issueId, magazineIssues.id))
+        .innerJoin(magazines, eq(articles.magazineId, magazines.id))
         .where(whereClause);
 
-      const totalCount = countRes[0]?.count ?? 0;
-      const domainArticles = rows.map(row => ArticleMapper.toDomain(row));
+      const totalCount = Number(countResult[0]?.count ?? rows.length);
 
       return {
-        articles: domainArticles,
+        articles: rows.map((row) => ArticleMapper.toDomain(row)),
         totalCount,
       };
     } catch (error) {
-      console.error('Error executing searchByTopic in PostgresArticleRepository:', error);
-      throw new Error('No se pudo completar la búsqueda en el catálogo de revistas.', { cause: error });
+      console.error('Error executing searchArticles query:', error);
+      throw new Error('Error al consultar el catálogo de artículos.', { cause: error });
     }
   }
 
   /**
-   * Find a single article by ID
+   * Fetch a single article by its primary ID
    */
   public async findById(id: number): Promise<Article | null> {
     try {
@@ -97,16 +96,19 @@ export class PostgresArticleRepository implements IArticleRepository {
         .where(eq(articles.id, id))
         .limit(1);
 
-      if (rows.length === 0) return null;
+      if (rows.length === 0) {
+        return null;
+      }
+
       return ArticleMapper.toDomain(rows[0]);
     } catch (error) {
-      console.error(`Error finding article by id ${id}:`, error);
-      throw new Error(`Error al recuperar el artículo con identificador ${id}.`, { cause: error });
+      console.error(`Error querying article by id ${id}:`, error);
+      throw new Error(`Error al recuperar el artículo con ID ${id}.`, { cause: error });
     }
   }
 
   /**
-   * Find featured articles for showcase
+   * Find highlighted or featured articles
    */
   public async findFeatured(limit = 8): Promise<Article[]> {
     try {
@@ -119,18 +121,19 @@ export class PostgresArticleRepository implements IArticleRepository {
         .from(articles)
         .innerJoin(magazineIssues, eq(articles.issueId, magazineIssues.id))
         .innerJoin(magazines, eq(articles.magazineId, magazines.id))
-        .orderBy(desc(articles.featured), desc(magazineIssues.year))
+        .where(eq(articles.featured, true))
+        .orderBy(desc(magazineIssues.year), articles.startPage)
         .limit(limit);
 
-      return rows.map(row => ArticleMapper.toDomain(row));
+      return rows.map((row) => ArticleMapper.toDomain(row));
     } catch (error) {
-      console.error('Error fetching featured articles:', error);
-      throw new Error('Error al cargar artículos destacados de la base de datos.', { cause: error });
+      console.error('Error querying featured articles:', error);
+      throw new Error('Error al recuperar artículos destacados.', { cause: error });
     }
   }
 
   /**
-   * Get all magazines with summary metrics
+   * Retrieve summaries of indexed magazines
    */
   public async getMagazines(): Promise<MagazineSummary[]> {
     try {
@@ -140,12 +143,12 @@ export class PostgresArticleRepository implements IArticleRepository {
 
       for (const mag of allMagazines) {
         const issuesCountRes = await db
-          .select({ count: sql<number>`cast(count(*) as int)` })
+          .select({ count: sql<number>`count(*)` })
           .from(magazineIssues)
           .where(eq(magazineIssues.magazineId, mag.id));
 
         const articlesCountRes = await db
-          .select({ count: sql<number>`cast(count(*) as int)` })
+          .select({ count: sql<number>`count(*)` })
           .from(articles)
           .where(eq(articles.magazineId, mag.id));
 
@@ -169,9 +172,9 @@ export class PostgresArticleRepository implements IArticleRepository {
   }
 
   /**
-   * Distinct popular topics indexed in catalogue
+   * Distinct popular destinations indexed in catalogue
    */
-  public async getPopularTopics(): Promise<Topic[]> {
+  public async getPopularDestinations(): Promise<string[]> {
     try {
       const distinctRows = await db
         .selectDistinct({
@@ -183,16 +186,18 @@ export class PostgresArticleRepository implements IArticleRepository {
         .orderBy(articles.country, articles.city)
         .limit(20);
 
-      return distinctRows.map(row =>
-        Topic.create({
-          name: row.city || row.country,
-          subtopic: row.region,
-          category: row.country,
-        })
-      );
+      return distinctRows.map((row) => {
+        if (row.city && row.country) {
+          return `${row.city} · ${row.country}`;
+        }
+        if (row.region && row.country) {
+          return `${row.region} · ${row.country}`;
+        }
+        return row.city || row.country;
+      });
     } catch (error) {
-      console.error('Error fetching popular topics:', error);
-      throw new Error('Error al consultar las temáticas del catálogo.', { cause: error });
+      console.error('Error fetching popular destinations:', error);
+      throw new Error('Error al consultar los destinos del catálogo.', { cause: error });
     }
   }
 }

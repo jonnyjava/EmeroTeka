@@ -3,13 +3,12 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import {
-  Tag,
+  MapPin,
   Calendar,
   User,
   BookOpen,
   ArrowUpRight,
   Compass,
-  Bookmark,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,11 +35,11 @@ export const ResponsiveArticleGrid: React.FC<ResponsiveArticleGridProps> = ({
           </div>
 
           <h3 className="font-serif text-2xl font-bold text-[#1B275E]">
-            No hay artículos indexados para esta temática
+            No hay artículos indexados para esta búsqueda
           </h3>
 
           <p className="text-sm text-[#475569] leading-relaxed">
-            No se han encontrado registros con esos criterios en la base de datos de revistas. Prueba con temáticas clásicas como{' '}
+            No se han encontrado registros con esos criterios en la base de datos de revistas. Prueba buscando destinos como{' '}
             <strong className="text-[#2A3E92]">Petra</strong>, <strong className="text-[#2A3E92]">Kioto</strong>,{' '}
             <strong className="text-[#2A3E92]">Cusco</strong>, <strong className="text-[#2A3E92]">Svalbard</strong> o{' '}
             <strong className="text-[#2A3E92]">Samarcanda</strong>.
@@ -163,19 +162,19 @@ const IndexedMagazineCard: React.FC<IndexedMagazineCardProps> = ({
           </div>
         </div>
 
-        {/* 2. TEMÁTICA ENCONTRADA (DESTACADA VISUALMENTE EN ST TROPAZ #2A3E92) */}
+        {/* 2. DESTINO GEOGRÁFICO ENCONTRADO (DESTACADO EN ST TROPAZ #2A3E92) */}
         <div className="absolute bottom-3.5 left-4 right-4 z-10">
           <div className="bg-white/95 backdrop-blur-md border border-[#CCD5EE] rounded-xl p-3 shadow-lg flex items-center justify-between gap-2">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="p-2 rounded-lg bg-[#2A3E92] text-white shrink-0 shadow-xs">
-                <Tag className="w-4 h-4 text-[#FFC72C]" />
+                <MapPin className="w-4 h-4 text-[#FFC72C]" />
               </div>
               <div className="truncate">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-[#2A3E92] block font-bold">
-                  Temática Encontrada
+                  Destino Encontrado
                 </span>
                 <span className="font-serif font-bold text-base text-[#1B275E] truncate block leading-tight">
-                  {article.topic.formatted}
+                  {article.location}
                 </span>
               </div>
             </div>

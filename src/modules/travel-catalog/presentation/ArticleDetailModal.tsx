@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { X, Copy, Check, Tag, BookOpen, User, Camera, Calendar, FileText, Bookmark } from 'lucide-react';
+import { X, Copy, Check, MapPin, BookOpen, User, Camera, Calendar, FileText, Bookmark } from 'lucide-react';
 import { ArticleDTO } from '../domain/Article.ts';
 
 interface ArticleDetailModalProps {
@@ -19,7 +19,7 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
   if (!article) return null;
 
   // Generate standard bibliographic reference
-  const bibliographicCitation = `${article.author || 'Redacción'}. (${article.magazine.year}). "${article.title}". ${article.magazine.name}, ${article.magazine.issueNumber}, ${article.pageCitation}. Temática: ${article.topic.formatted}.`;
+  const bibliographicCitation = `${article.author || 'Redacción'}. (${article.magazine.year}). "${article.title}". ${article.magazine.name}, ${article.magazine.issueNumber}, ${article.pageCitation}. Destino: ${article.location}.`;
 
   const handleCopyCitation = () => {
     navigator.clipboard.writeText(bibliographicCitation);
@@ -93,23 +93,27 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
             )}
           </div>
 
-          {/* Quick Topic & Pagination Highlight Strip (Lonely Planet Style) */}
+          {/* Quick Destination & Pagination Highlight Strip */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4.5 bg-[#F8FAFC] border-2 border-[#DCE2EE] rounded-xl">
             <div className="flex items-start gap-3">
               <div className="p-2 bg-[#2A3E92] text-white rounded-lg shrink-0 mt-0.5 shadow-2xs">
-                <Tag className="w-4 h-4 text-[#FFC72C]" />
+                <MapPin className="w-4 h-4 text-[#FFC72C]" />
               </div>
               <div>
                 <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] block font-bold">
-                  Temática Indexada
+                  Destino Geográfico
                 </span>
                 <span className="text-base font-bold text-[#1B275E] block font-serif">
-                  {article.topic.formatted}
+                  {article.location}
                 </span>
                 <span className="text-xs text-slate-500">
-                  {article.topic.name && `Tema: ${article.topic.name} · `}
-                  {article.topic.subtopic && `Subtema: ${article.topic.subtopic} · `}
-                  {article.topic.category && `Categoría: ${article.topic.category}`}
+                  {[
+                    article.city && `Ciudad: ${article.city}`,
+                    article.region && `Región: ${article.region}`,
+                    article.country && `País: ${article.country}`,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')}
                 </span>
               </div>
             </div>
@@ -142,82 +146,84 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
             </p>
           </div>
 
-          {/* Credits Grid (Author, Photographer, Tags) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t-2 border-[#DCE2EE]">
-            <div>
-              <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] font-bold block mb-1">
-                Créditos Editoriales
+          {/* Credits Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-[#DCE2EE] text-xs">
+            <div className="flex items-center gap-2 text-slate-600">
+              <User className="w-4 h-4 text-[#2A3E92]" />
+              <span>
+                <strong>Texto / Autor:</strong> {article.author || 'Redacción Editorial'}
               </span>
-              <div className="space-y-1.5 text-sm text-[#1B275E]">
-                <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-[#2A3E92] shrink-0" />
-                  <span>Texto: <strong className="font-semibold">{article.author || 'Redacción editorial'}</strong></span>
-                </div>
-                {article.photographer && (
-                  <div className="flex items-center gap-2">
-                    <Camera className="w-4 h-4 text-[#2A3E92] shrink-0" />
-                    <span>Fotografía: <strong className="font-semibold">{article.photographer}</strong></span>
-                  </div>
-                )}
-              </div>
             </div>
 
-            <div>
-              <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] font-bold block mb-1">
-                Descriptores Temáticos
+            <div className="flex items-center gap-2 text-slate-600">
+              <Camera className="w-4 h-4 text-[#2A3E92]" />
+              <span>
+                <strong>Fotografía:</strong> {article.photographer || 'Archivo de la Revista'}
               </span>
-              <div className="flex flex-wrap gap-1.5">
-                {article.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs px-2.5 py-0.5 bg-[#EEF2FF] text-[#2A3E92] border border-[#CCD5EE] rounded-md font-mono font-medium"
-                  >
-                    #{tag}
-                  </span>
-                ))}
-              </div>
             </div>
           </div>
 
-          {/* Citation Generator Box in Lonely Planet St Tropaz Theme */}
-          <div className="p-4.5 bg-[#F8FAFC] border-2 border-[#DCE2EE] rounded-xl space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] font-bold">
-                Cita Bibliográfica para Archivo o Investigación
+          {/* Tags */}
+          {article.tags.length > 0 && (
+            <div className="pt-2 flex flex-wrap items-center gap-1.5">
+              <span className="text-xs font-mono uppercase text-slate-400 font-bold mr-1">
+                Etiquetas:
               </span>
+              {article.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-xs bg-[#EEF2FF] text-[#2A3E92] px-2.5 py-1 rounded-md border border-[#CCD5EE] font-medium"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Bibliographic Citation Box */}
+          <div className="p-4 bg-[#F8FAFC] border-2 border-[#DCE2EE] rounded-xl space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] font-bold flex items-center gap-1.5">
+                <Bookmark className="w-3.5 h-3.5" />
+                Cita Bibliográfica para Investigadores
+              </span>
+
               <button
                 type="button"
                 onClick={handleCopyCitation}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#2A3E92] hover:bg-[#1E2D69] py-1 px-3 rounded-lg shadow-2xs transition-colors cursor-pointer"
+                className="text-xs font-bold text-[#2A3E92] hover:text-[#1E2D69] flex items-center gap-1 py-1 px-2.5 rounded border border-[#CCD5EE] hover:bg-white transition-colors cursor-pointer"
               >
                 {copied ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-[#FFC72C]" />
-                    <span>¡Copiado!</span>
+                    <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-emerald-700">¡Copiado!</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="w-3.5 h-3.5 text-white/90" />
+                    <Copy className="w-3.5 h-3.5" />
                     <span>Copiar Cita</span>
                   </>
                 )}
               </button>
             </div>
 
-            <p className="font-mono text-xs text-[#1B275E] bg-white p-3 rounded-lg border border-[#CCD5EE] select-all leading-relaxed break-words font-medium">
+            <p className="font-mono text-xs text-slate-700 bg-white p-3 rounded-lg border border-[#DCE2EE] leading-relaxed break-all">
               {bibliographicCitation}
             </p>
           </div>
         </div>
 
         {/* Modal Footer */}
-        <div className="sticky bottom-0 bg-[#F8FAFC] px-6 py-3.5 border-t-2 border-[#DCE2EE] flex items-center justify-end">
+        <div className="bg-[#F8FAFC] px-6 py-4 border-t-2 border-[#DCE2EE] flex items-center justify-between text-xs text-slate-500">
+          <span className="font-mono">
+            Indexado en {article.magazine.name}
+          </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-bold text-[#1B275E] bg-white border border-[#CCD5EE] rounded-lg hover:bg-[#EEF2FF] hover:text-[#2A3E92] transition-colors cursor-pointer"
+            className="px-4 py-2 bg-[#2A3E92] hover:bg-[#1E2D69] text-white font-bold rounded-lg transition-colors cursor-pointer"
           >
-            Cerrar Ficha
+            Cerrar
           </button>
         </div>
       </div>

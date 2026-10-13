@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Tag, MapPin, User, ArrowUpRight, Compass } from 'lucide-react';
+import { MapPin, User, ArrowUpRight } from 'lucide-react';
 import { ArticleDTO } from '../domain/Article.ts';
 
 interface ArticleCardProps {
@@ -30,7 +30,7 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onSelect }) =
         {article.coverImageUrl && !imageFailed ? (
           <Image
             src={article.coverImageUrl}
-            alt={`Portada de ${article.magazine.name} sobre ${article.topic.formatted}`}
+            alt={`Portada de ${article.magazine.name} sobre ${article.location}`}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             referrerPolicy="no-referrer"
@@ -51,11 +51,11 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onSelect }) =
         {/* Editorial Scrim Overlay for Contrast */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#141E46]/90 via-[#1B275E]/30 to-transparent pointer-events-none" />
 
-        {/* Topic Tag on Visual */}
+        {/* Location Tag on Visual */}
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
           <div className="flex items-center gap-1.5 font-bold drop-shadow-xs bg-[#2A3E92]/90 px-2 py-0.5 rounded border border-white/20">
-            <Tag className="w-3.5 h-3.5 text-[#FFC72C]" />
-            <span className="truncate">{article.topic.formatted}</span>
+            <MapPin className="w-3.5 h-3.5 text-[#FFC72C]" />
+            <span className="truncate">{article.location}</span>
           </div>
 
           <span className="font-mono text-[11px] bg-[#141E46]/90 backdrop-blur-xs px-2 py-0.5 rounded text-white tabular-nums border border-white/20 font-bold">
@@ -98,18 +98,18 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onSelect }) =
         <div className="pt-4 mt-4 border-t border-[#DCE2EE] flex items-center justify-between text-xs text-slate-500">
           <div className="truncate max-w-[200px]">
             {article.author ? (
-              <span className="flex items-center gap-1 truncate text-[#1B275E] font-semibold">
-                <User className="w-3 h-3 text-[#2A3E92] shrink-0" />
-                <span className="truncate">{article.author}</span>
+              <span className="flex items-center gap-1.5 truncate text-[#1B275E]">
+                <User className="w-3.5 h-3.5 text-[#2A3E92] shrink-0" />
+                <span className="truncate font-semibold">{article.author}</span>
               </span>
             ) : (
               <span className="text-slate-400">Redacción editorial</span>
             )}
           </div>
 
-          <div className="flex items-center gap-1 font-bold text-[#2A3E92] group-hover:text-[#1E2D69] transition-colors">
-            <span>Ficha completa</span>
-            <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          <div className="flex items-center gap-1 text-[#2A3E92] font-semibold group-hover:underline">
+            <span>Ficha</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
           </div>
         </div>
       </div>
