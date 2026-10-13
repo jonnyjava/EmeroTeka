@@ -6,11 +6,10 @@ import { PredictiveLocationSearchBar } from './PredictiveLocationSearchBar.tsx';
 import { ResponsiveArticleGrid } from './ResponsiveArticleGrid.tsx';
 import { MagazineShowcase } from './MagazineShowcase.tsx';
 import { ArticleDetailModal } from './ArticleDetailModal.tsx';
-import { ArchitectureInfoModal } from './ArchitectureInfoModal.tsx';
 import { ArticleDTO } from '../domain/Article.ts';
 import { MagazineSummary } from '../domain/IArticleRepository.ts';
 import { searchArticlesAction } from '@/app/actions/search.ts';
-import { Compass, BookOpen, Layers, Search, Sparkles, MapPin, Bookmark } from 'lucide-react';
+import { Compass } from 'lucide-react';
 
 interface TravelCatalogAppProps {
   initialMagazines: MagazineSummary[];
@@ -28,7 +27,6 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
   const [selectedYear, setSelectedYear] = useState<number | undefined>(undefined);
   const [articles, setArticles] = useState<ArticleDTO[]>(initialArticles);
   const [selectedArticle, setSelectedArticle] = useState<ArticleDTO | null>(null);
-  const [isArchitectureOpen, setIsArchitectureOpen] = useState(false);
   const [isSearching, startTransition] = useTransition();
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -76,7 +74,6 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
       {/* Top Bar Header in Lonely Planet St Tropaz palette */}
       <CatalogHeader
         onSearchFocus={handleFocusSearch}
-        onOpenArchitecture={() => setIsArchitectureOpen(true)}
         totalArticles={articles.length}
       />
 
@@ -194,12 +191,6 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
         onClose={() => setSelectedArticle(null)}
       />
 
-      {/* Clean Architecture / DDD Educational Modal */}
-      <ArchitectureInfoModal
-        isOpen={isArchitectureOpen}
-        onClose={() => setIsArchitectureOpen(false)}
-      />
-
       {/* Footer in Editorial Deep St Tropaz Blue */}
       <footer className="bg-[#141E46] text-white border-t-4 border-[#FFC72C] py-12 px-4 sm:px-6 lg:px-8 mt-16">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
@@ -209,7 +200,7 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
             </div>
             <div>
               <span className="font-display text-lg font-bold tracking-wider uppercase block text-white">
-                Archivia Viaggi
+                Emero.tk Viaggi
               </span>
               <span className="text-xs text-slate-400 font-mono">
                 Catálogo Histórico Bibliográfico de Revistas de Viajes
@@ -221,14 +212,6 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
             <span>Next.js 15 App Router</span>
             <span>·</span>
             <span>Clean Architecture / DDD</span>
-            <span>·</span>
-            <button
-              type="button"
-              onClick={() => setIsArchitectureOpen(true)}
-              className="text-[#FFC72C] hover:underline cursor-pointer font-bold"
-            >
-              Arquitectura DDD & Capas
-            </button>
           </div>
         </div>
       </footer>

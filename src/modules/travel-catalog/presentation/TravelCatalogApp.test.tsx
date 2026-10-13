@@ -109,7 +109,7 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
     expect(screen.queryByText('Ficha Bibliográfica del Catálogo')).not.toBeInTheDocument();
   });
 
-  it('opens and closes ArchitectureInfoModal from header and footer', () => {
+  it('renders Emero.tk branding in header and footer without Arquitectura DDD link', () => {
     render(
       <TravelCatalogApp
         initialMagazines={sampleMagazines}
@@ -117,26 +117,15 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
       />
     );
 
-    // Open from header nav
-    const headerArchBtn = screen.getByRole('button', { name: 'Arquitectura DDD' });
-    fireEvent.click(headerArchBtn);
+    // Header branding
+    expect(screen.getByText('Emero.tk')).toBeInTheDocument();
 
-    expect(
-      screen.getByText('Arquitectura Limpia & Domain-Driven Design (DDD)')
-    ).toBeInTheDocument();
+    // Footer branding
+    expect(screen.getByText('Emero.tk Viaggi')).toBeInTheDocument();
 
-    // Close modal
-    fireEvent.click(screen.getByLabelText('Cerrar modal'));
-    expect(
-      screen.queryByText('Arquitectura Limpia & Domain-Driven Design (DDD)')
-    ).not.toBeInTheDocument();
-
-    // Open from footer link
-    const footerArchBtn = screen.getByRole('button', { name: 'Arquitectura DDD & Capas' });
-    fireEvent.click(footerArchBtn);
-    expect(
-      screen.getByText('Arquitectura Limpia & Domain-Driven Design (DDD)')
-    ).toBeInTheDocument();
+    // Architecture DDD links must not exist
+    expect(screen.queryByRole('button', { name: /arquitectura ddd/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /arquitectura ddd & capas/i })).not.toBeInTheDocument();
   });
 
   it('triggers debounced search action when search query changes', async () => {

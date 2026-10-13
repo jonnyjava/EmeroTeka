@@ -2,17 +2,15 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Compass, BookOpen, Layers, Search, Globe, Bookmark } from 'lucide-react';
+import { Compass, Search } from 'lucide-react';
 
 interface CatalogHeaderProps {
   onSearchFocus: () => void;
-  onOpenArchitecture: () => void;
   totalArticles: number;
 }
 
 export const CatalogHeader: React.FC<CatalogHeaderProps> = ({
   onSearchFocus,
-  onOpenArchitecture,
   totalArticles,
 }) => {
   return (
@@ -35,7 +33,7 @@ export const CatalogHeader: React.FC<CatalogHeaderProps> = ({
             <div className="flex items-center gap-2 bg-[#2A3E92] text-white px-3.5 py-1.5 rounded-lg shadow-sm border border-[#1B275E]/40">
               <Compass className="w-4 h-4 text-[#FFC72C]" />
               <span className="font-display text-lg sm:text-xl font-bold tracking-widest text-white uppercase">
-                Archivia
+                Emero.tk
               </span>
             </div>
 
@@ -77,14 +75,6 @@ export const CatalogHeader: React.FC<CatalogHeaderProps> = ({
           >
             Hemeroteca de Revistas
           </a>
-          <button
-            type="button"
-            onClick={onOpenArchitecture}
-            className="flex items-center gap-1.5 text-[#475569] hover:text-[#2A3E92] transition-colors cursor-pointer font-semibold"
-          >
-            <Layers className="w-3.5 h-3.5 text-[#2A3E92]" />
-            <span>Arquitectura DDD</span>
-          </button>
         </nav>
 
         {/* Zone 3: Primary Action (St Tropaz #2A3E92 Button with Gold Accent) */}

@@ -4,19 +4,17 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { CatalogHeader } from './CatalogHeader.tsx';
 
 describe('CatalogHeader Component', () => {
-  it('renders branding, links, article counter, and triggers search focus and architecture modal', () => {
+  it('renders branding, links, article counter, and triggers search focus', () => {
     const handleSearchFocus = vi.fn();
-    const handleOpenArchitecture = vi.fn();
 
     render(
       <CatalogHeader
         onSearchFocus={handleSearchFocus}
-        onOpenArchitecture={handleOpenArchitecture}
         totalArticles={128}
       />
     );
 
-    expect(screen.getByText('Archivia')).toBeInTheDocument();
+    expect(screen.getByText('Emero.tk')).toBeInTheDocument();
     expect(screen.getByText('Viaggi')).toBeInTheDocument();
     expect(screen.getByText('128')).toBeInTheDocument();
 
@@ -30,10 +28,8 @@ describe('CatalogHeader Component', () => {
     fireEvent.click(exploreBtn);
     expect(handleSearchFocus).toHaveBeenCalledTimes(2);
 
-    // Click 'Arquitectura DDD' button
-    const archBtn = screen.getByRole('button', { name: /arquitectura ddd/i });
-    fireEvent.click(archBtn);
-    expect(handleOpenArchitecture).toHaveBeenCalledTimes(1);
+    // Ensure Arquitectura DDD link is no longer present
+    expect(screen.queryByText(/arquitectura ddd/i)).not.toBeInTheDocument();
   });
 
   it('scrolls into view when Hemeroteca de Revistas link is clicked', () => {
@@ -46,7 +42,6 @@ describe('CatalogHeader Component', () => {
     render(
       <CatalogHeader
         onSearchFocus={vi.fn()}
-        onOpenArchitecture={vi.fn()}
         totalArticles={50}
       />
     );
