@@ -23,6 +23,13 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Security Scan (Snyk)
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+          
       - name: Run ESLint
         run: npm run lint
 
