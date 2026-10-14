@@ -24,6 +24,10 @@ export default defineConfig({
         'hooks/use-mobile.ts',
         'components/ui/**/*.tsx',
         'src/modules/travel-catalog/presentation/**/*.tsx',
+        'src/modules/admin-auth/**/*.ts',
+        'src/modules/admin-auth/**/*.tsx',
+        'src/modules/admin-management/**/*.ts',
+        'src/modules/admin-management/**/*.tsx',
       ],
       exclude: [
         'src/modules/travel-catalog/infrastructure/seed.ts',
