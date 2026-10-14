@@ -12,7 +12,7 @@ import { ArticleMapper } from './ArticleMapper.ts';
 
 export class PostgresArticleRepository implements IArticleRepository {
   /**
-   * Search articles by destination, location, title, or keywords
+   * Search articles by title, author, synopsis, tags, or magazine
    */
   public async searchArticles(filter: SearchArticlesFilter): Promise<SearchResult> {
     try {
@@ -24,12 +24,12 @@ export class PostgresArticleRepository implements IArticleRepository {
 
         conditions.push(
           or(
-            ilike(articles.city, searchPattern),
-            ilike(articles.region, searchPattern),
-            ilike(articles.country, searchPattern),
-            ilike(articles.locationSearchIndex, searchPattern),
             ilike(articles.title, searchPattern),
-            ilike(articles.tags, searchPattern)
+            ilike(articles.subtitle, searchPattern),
+            ilike(articles.author, searchPattern),
+            ilike(articles.synopsis, searchPattern),
+            ilike(articles.tags, searchPattern),
+            ilike(magazines.name, searchPattern)
           )
         );
       }
@@ -96,21 +96,21 @@ export class PostgresArticleRepository implements IArticleRepository {
         .where(eq(articles.id, id))
         .limit(1);
 
-      if (rows.length === 0) {
+      if (!rows || rows.length === 0) {
         return null;
       }
 
       return ArticleMapper.toDomain(rows[0]);
     } catch (error) {
-      console.error(`Error querying article by id ${id}:`, error);
+      console.error(`Error querying article by ID ${id}:`, error);
       throw new Error(`Error al recuperar el artículo con ID ${id}.`, { cause: error });
     }
   }
 
   /**
-   * Find highlighted or featured articles
+   * Retrieve featured articles highlighted on catalog landing
    */
-  public async findFeatured(limit = 8): Promise<Article[]> {
+  public async findFeatured(limit = 6): Promise<Article[]> {
     try {
       const rows = await db
         .select({
@@ -122,7 +122,7 @@ export class PostgresArticleRepository implements IArticleRepository {
         .innerJoin(magazineIssues, eq(articles.issueId, magazineIssues.id))
         .innerJoin(magazines, eq(articles.magazineId, magazines.id))
         .where(eq(articles.featured, true))
-        .orderBy(desc(magazineIssues.year), articles.startPage)
+        .orderBy(desc(magazineIssues.year), desc(articles.id))
         .limit(limit);
 
       return rows.map((row) => ArticleMapper.toDomain(row));
@@ -158,9 +158,8 @@ export class PostgresArticleRepository implements IArticleRepository {
           publisher: mag.publisher ?? undefined,
           country: mag.country ?? undefined,
           description: mag.description ?? undefined,
-          coverImageUrl: mag.coverImageUrl ?? undefined,
-          issuesCount: issuesCountRes[0]?.count ?? 0,
-          articlesCount: articlesCountRes[0]?.count ?? 0,
+          issuesCount: Number(issuesCountRes[0]?.count ?? 0),
+          articlesCount: Number(articlesCountRes[0]?.count ?? 0),
         });
       }
 
@@ -172,29 +171,22 @@ export class PostgresArticleRepository implements IArticleRepository {
   }
 
   /**
-   * Distinct popular destinations indexed in catalogue
+   * Distinct popular countries indexed from magazines
    */
   public async getPopularDestinations(): Promise<string[]> {
     try {
-      const distinctRows = await db
+      const distinctCountries = await db
         .selectDistinct({
-          city: articles.city,
-          region: articles.region,
-          country: articles.country,
+          country: magazines.country,
         })
-        .from(articles)
-        .orderBy(articles.country, articles.city)
+        .from(magazines)
+        .where(sql`${magazines.country} IS NOT NULL AND ${magazines.country} != ''`)
+        .orderBy(magazines.country)
         .limit(20);
 
-      return distinctRows.map((row) => {
-        if (row.city && row.country) {
-          return `${row.city} · ${row.country}`;
-        }
-        if (row.region && row.country) {
-          return `${row.region} · ${row.country}`;
-        }
-        return row.city || row.country;
-      });
+      return distinctCountries
+        .map((r) => r.country)
+        .filter((c): c is string => Boolean(c && c.length > 0));
     } catch (error) {
       console.error('Error fetching popular destinations:', error);
       throw new Error('Error al consultar los destinos del catálogo.', { cause: error });

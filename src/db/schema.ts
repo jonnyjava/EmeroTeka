@@ -17,11 +17,10 @@ export const magazines = pgTable('magazines', {
   country: text('country'),
   issn: text('issn'),
   description: text('description'),
-  coverImageUrl: text('cover_image_url'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
-// Issues of Magazines (Year, Issue Number, Month, Volume)
+// Issues of Magazines (Year, Issue Number, Month)
 export const magazineIssues = pgTable('magazine_issues', {
   id: serial('id').primaryKey(),
   magazineId: integer('magazine_id')
@@ -30,13 +29,12 @@ export const magazineIssues = pgTable('magazine_issues', {
   issueNumber: text('issue_number').notNull(),
   year: integer('year').notNull(),
   month: text('month'),
-  volume: text('volume'),
   title: text('title'),
   coverImageUrl: text('cover_image_url'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
-// Articles indexed by location, page range, issue, and magazine
+// Articles indexed by page range, issue, and magazine
 export const articles = pgTable('articles', {
   id: serial('id').primaryKey(),
   magazineId: integer('magazine_id')
@@ -48,18 +46,11 @@ export const articles = pgTable('articles', {
   title: text('title').notNull(),
   subtitle: text('subtitle'),
   author: text('author'),
-  photographer: text('photographer'),
   startPage: integer('start_page').notNull(),
   endPage: integer('end_page').notNull(),
-  // Location indexing fields
-  city: text('city'),
-  region: text('region'),
-  country: text('country').notNull(),
-  locationSearchIndex: text('location_search_index').notNull(),
   synopsis: text('synopsis').notNull(),
   tags: text('tags'),
   featured: boolean('featured').default(false),
-  coverImageUrl: text('cover_image_url'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 

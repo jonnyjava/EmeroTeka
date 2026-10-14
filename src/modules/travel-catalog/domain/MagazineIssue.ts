@@ -2,7 +2,7 @@
  * Entity: MagazineIssue
  *
  * Represents an issue or edition of a travel publication.
- * Encapsulates the journal name, volume, number, year, and metadata.
+ * Encapsulates the journal name, number, year, and metadata.
  */
 export interface MagazineIssueProps {
   id: number;
@@ -11,7 +11,6 @@ export interface MagazineIssueProps {
   issueNumber: string;
   year: number;
   month?: string | null;
-  volume?: string | null;
   title?: string | null;
   coverImageUrl?: string | null;
 }
@@ -23,7 +22,6 @@ export class MagazineIssue {
   private readonly _issueNumber: string;
   private readonly _year: number;
   private readonly _month?: string;
-  private readonly _volume?: string;
   private readonly _title?: string;
   private readonly _coverImageUrl?: string;
 
@@ -34,7 +32,6 @@ export class MagazineIssue {
     this._issueNumber = props.issueNumber.trim();
     this._year = props.year;
     this._month = props.month?.trim() || undefined;
-    this._volume = props.volume?.trim() || undefined;
     this._title = props.title?.trim() || undefined;
     this._coverImageUrl = props.coverImageUrl?.trim() || undefined;
   }
@@ -78,10 +75,6 @@ export class MagazineIssue {
     return this._month;
   }
 
-  public get volume(): string | undefined {
-    return this._volume;
-  }
-
   public get title(): string | undefined {
     return this._title;
   }
@@ -91,14 +84,11 @@ export class MagazineIssue {
   }
 
   /**
-   * Generates a bibliographic reference for citation (e.g. "National Geographic · Vol. 186, Nº 4 (Octubre 1994)").
+   * Generates a bibliographic reference for citation (e.g. "National Geographic · Nº 4 (Octubre 1994)").
    */
   public getFullCitation(): string {
-    const details: string[] = [];
-    if (this._volume) details.push(this._volume);
-    details.push(`Nº ${this._issueNumber}`);
     const timeStr = this._month ? `${this._month} ${this._year}` : `${this._year}`;
-    return `${this._magazineName} · ${details.join(', ')} (${timeStr})`;
+    return `${this._magazineName} · Nº ${this._issueNumber} (${timeStr})`;
   }
 
   public toJSON() {
@@ -109,7 +99,6 @@ export class MagazineIssue {
       issueNumber: this._issueNumber,
       year: this._year,
       month: this._month,
-      volume: this._volume,
       title: this._title,
       coverImageUrl: this._coverImageUrl,
       fullCitation: this.getFullCitation(),

@@ -19,7 +19,6 @@ export interface MagazineSummary {
   publisher?: string;
   country?: string;
   description?: string;
-  coverImageUrl?: string;
   issuesCount: number;
   articlesCount: number;
 }

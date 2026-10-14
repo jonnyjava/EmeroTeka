@@ -4,25 +4,19 @@ import { MagazineIssue } from './MagazineIssue.ts';
  * Domain Aggregate Root / Entity: Article
  *
  * Represents an indexed magazine article with strict domain invariants,
- * page range validations, geographic destination indexing (city, region, country),
- * and association with a MagazineIssue Entity.
+ * page range validations, and association with a MagazineIssue Entity.
  */
 export interface ArticleProps {
   id: number;
   title: string;
   subtitle?: string | null;
   author?: string | null;
-  photographer?: string | null;
   startPage: number;
   endPage: number;
-  city?: string | null;
-  region?: string | null;
-  country: string;
   issue: MagazineIssue;
   synopsis: string;
   tags?: string[] | null;
   featured?: boolean;
-  coverImageUrl?: string | null;
   createdAt?: Date | null;
 }
 
@@ -31,15 +25,10 @@ export interface ArticleDTO {
   title: string;
   subtitle?: string;
   author?: string;
-  photographer?: string;
   startPage: number;
   endPage: number;
   pageCount: number;
   pageCitation: string;
-  city?: string;
-  region?: string;
-  country: string;
-  location: string;
   magazine: {
     id: number;
     name: string;
@@ -52,7 +41,6 @@ export interface ArticleDTO {
   synopsis: string;
   tags: string[];
   featured: boolean;
-  coverImageUrl?: string;
   catalogReference: string;
 }
 
@@ -61,17 +49,12 @@ export class Article {
   private readonly _title: string;
   private readonly _subtitle?: string;
   private readonly _author?: string;
-  private readonly _photographer?: string;
   private readonly _startPage: number;
   private readonly _endPage: number;
-  private readonly _city?: string;
-  private readonly _region?: string;
-  private readonly _country: string;
   private readonly _issue: MagazineIssue;
   private readonly _synopsis: string;
   private readonly _tags: readonly string[];
   private readonly _featured: boolean;
-  private readonly _coverImageUrl?: string;
   private readonly _createdAt?: Date;
 
   private constructor(props: ArticleProps) {
@@ -79,17 +62,12 @@ export class Article {
     this._title = props.title.trim();
     this._subtitle = props.subtitle?.trim() || undefined;
     this._author = props.author?.trim() || undefined;
-    this._photographer = props.photographer?.trim() || undefined;
     this._startPage = props.startPage;
     this._endPage = props.endPage;
-    this._city = props.city?.trim() || undefined;
-    this._region = props.region?.trim() || undefined;
-    this._country = props.country.trim();
     this._issue = props.issue;
     this._synopsis = props.synopsis.trim();
     this._tags = Object.freeze(props.tags ? [...props.tags] : []);
     this._featured = Boolean(props.featured);
-    this._coverImageUrl = props.coverImageUrl?.trim() || undefined;
     this._createdAt = props.createdAt || undefined;
   }
 
@@ -105,9 +83,6 @@ export class Article {
     }
     if (!Number.isInteger(props.endPage) || props.endPage < props.startPage) {
       throw new Error('Article invariant violation: endPage must be greater than or equal to startPage.');
-    }
-    if (!props.country || props.country.trim().length < 2) {
-      throw new Error('Article invariant violation: Country must be at least 2 characters long.');
     }
     if (!props.issue || !(props.issue instanceof MagazineIssue)) {
       throw new Error('Article invariant violation: Article must be associated with a valid MagazineIssue Entity.');
@@ -135,28 +110,12 @@ export class Article {
     return this._author;
   }
 
-  public get photographer(): string | undefined {
-    return this._photographer;
-  }
-
   public get startPage(): number {
     return this._startPage;
   }
 
   public get endPage(): number {
     return this._endPage;
-  }
-
-  public get city(): string | undefined {
-    return this._city;
-  }
-
-  public get region(): string | undefined {
-    return this._region;
-  }
-
-  public get country(): string {
-    return this._country;
   }
 
   public get issue(): MagazineIssue {
@@ -173,10 +132,6 @@ export class Article {
 
   public get featured(): boolean {
     return this._featured;
-  }
-
-  public get coverImageUrl(): string | undefined {
-    return this._coverImageUrl;
   }
 
   public get createdAt(): Date | undefined {
@@ -210,19 +165,6 @@ export class Article {
   }
 
   /**
-   * Formatted geographic location string
-   */
-  public getLocation(): string {
-    if (this._city) {
-      return `${this._city} · ${this._country}`;
-    }
-    if (this._region) {
-      return `${this._region} · ${this._country}`;
-    }
-    return this._country;
-  }
-
-  /**
    * Export to serializable DTO
    */
   public toDTO(): ArticleDTO {
@@ -231,15 +173,10 @@ export class Article {
       title: this._title,
       subtitle: this._subtitle,
       author: this._author,
-      photographer: this._photographer,
       startPage: this._startPage,
       endPage: this._endPage,
       pageCount: this.getPageCount(),
       pageCitation: this.getPageCitation(),
-      city: this._city,
-      region: this._region,
-      country: this._country,
-      location: this.getLocation(),
       magazine: {
         id: this._issue.magazineId,
         name: this._issue.magazineName,
@@ -252,7 +189,6 @@ export class Article {
       synopsis: this._synopsis,
       tags: [...this._tags],
       featured: this._featured,
-      coverImageUrl: this._coverImageUrl || this._issue.coverImageUrl,
       catalogReference: this.getCatalogReference(),
     };
   }

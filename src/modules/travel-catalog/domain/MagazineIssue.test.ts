@@ -20,7 +20,6 @@ describe('MagazineIssue Entity', () => {
       expect(issue.issueNumber).toBe('145');
       expect(issue.year).toBe(2020);
       expect(issue.month).toBeUndefined();
-      expect(issue.volume).toBeUndefined();
       expect(issue.title).toBeUndefined();
       expect(issue.coverImageUrl).toBeUndefined();
     });
@@ -33,7 +32,6 @@ describe('MagazineIssue Entity', () => {
         issueNumber: ' 88 ',
         year: 2018,
         month: '  Septiembre  ',
-        volume: '  Vol. 12  ',
         title: '  Ruta de la Seda  ',
         coverImageUrl: '  https://example.com/cover.jpg  ',
       });
@@ -41,7 +39,6 @@ describe('MagazineIssue Entity', () => {
       expect(issue.magazineName).toBe('Altaïr');
       expect(issue.issueNumber).toBe('88');
       expect(issue.month).toBe('Septiembre');
-      expect(issue.volume).toBe('Vol. 12');
       expect(issue.title).toBe('Ruta de la Seda');
       expect(issue.coverImageUrl).toBe('https://example.com/cover.jpg');
     });
@@ -114,7 +111,7 @@ describe('MagazineIssue Entity', () => {
   });
 
   describe('Full Citation (getFullCitation)', () => {
-    it('formats citation without volume and without month', () => {
+    it('formats citation without month', () => {
       const issue = MagazineIssue.create({
         id: 1,
         magazineId: 1,
@@ -126,20 +123,17 @@ describe('MagazineIssue Entity', () => {
       expect(issue.getFullCitation()).toBe('Viajes National Geographic · Nº 210 (2021)');
     });
 
-    it('formats citation with volume and month', () => {
+    it('formats citation with month', () => {
       const issue = MagazineIssue.create({
         id: 1,
         magazineId: 1,
         magazineName: 'National Geographic',
         issueNumber: '4',
-        volume: 'Vol. 186',
         month: 'Octubre',
         year: 1994,
       });
 
-      expect(issue.getFullCitation()).toBe(
-        'National Geographic · Vol. 186, Nº 4 (Octubre 1994)'
-      );
+      expect(issue.getFullCitation()).toBe('National Geographic · Nº 4 (Octubre 1994)');
     });
   });
 
@@ -152,7 +146,6 @@ describe('MagazineIssue Entity', () => {
         issueNumber: '42',
         year: 2019,
         month: 'Julio',
-        volume: 'Año IV',
         title: 'Especial Japón',
         coverImageUrl: 'https://images.example.com/cover.jpg',
       });
@@ -164,10 +157,9 @@ describe('MagazineIssue Entity', () => {
         issueNumber: '42',
         year: 2019,
         month: 'Julio',
-        volume: 'Año IV',
         title: 'Especial Japón',
         coverImageUrl: 'https://images.example.com/cover.jpg',
-        fullCitation: 'Lonely Planet Magazine · Año IV, Nº 42 (Julio 2019)',
+        fullCitation: 'Lonely Planet Magazine · Nº 42 (Julio 2019)',
       });
     });
   });

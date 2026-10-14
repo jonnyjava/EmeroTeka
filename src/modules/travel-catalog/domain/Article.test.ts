@@ -18,17 +18,12 @@ describe('Article Aggregate Root', () => {
     title: 'Crónicas de los Andes',
     subtitle: 'Viaje a través del Valle Sagrado',
     author: 'Mario Vargas',
-    photographer: 'Martin Chambi',
     startPage: 40,
     endPage: 55,
-    city: 'Cusco',
-    region: 'Valle Sagrado',
-    country: 'Perú',
     issue: sampleIssue,
-    synopsis: 'Un recorrido detallado por la arquitectura y senderos incas.',
+    synopsis: 'Un recorrido detallado por la arquitectura y senderos históricos.',
     tags: ['Inca', 'Andes', 'Arqueología'],
     featured: true,
-    coverImageUrl: 'https://images.unsplash.com/cover-article.jpg',
     createdAt: new Date('2021-11-01T00:00:00Z'),
   };
 
@@ -40,17 +35,12 @@ describe('Article Aggregate Root', () => {
       expect(article.title).toBe('Crónicas de los Andes');
       expect(article.subtitle).toBe('Viaje a través del Valle Sagrado');
       expect(article.author).toBe('Mario Vargas');
-      expect(article.photographer).toBe('Martin Chambi');
       expect(article.startPage).toBe(40);
       expect(article.endPage).toBe(55);
-      expect(article.city).toBe('Cusco');
-      expect(article.region).toBe('Valle Sagrado');
-      expect(article.country).toBe('Perú');
       expect(article.issue).toBe(sampleIssue);
-      expect(article.synopsis).toBe('Un recorrido detallado por la arquitectura y senderos incas.');
+      expect(article.synopsis).toBe('Un recorrido detallado por la arquitectura y senderos históricos.');
       expect(article.tags).toEqual(['Inca', 'Andes', 'Arqueología']);
       expect(article.featured).toBe(true);
-      expect(article.coverImageUrl).toBe('https://images.unsplash.com/cover-article.jpg');
       expect(article.createdAt).toEqual(new Date('2021-11-01T00:00:00Z'));
     });
 
@@ -60,20 +50,14 @@ describe('Article Aggregate Root', () => {
         title: 'Ruta Polar',
         startPage: 1,
         endPage: 1,
-        country: 'Noruega',
         issue: sampleIssue,
         synopsis: 'Breve crónica sobre navegación entre fiordos.',
       });
 
       expect(article.subtitle).toBeUndefined();
       expect(article.author).toBeUndefined();
-      expect(article.photographer).toBeUndefined();
-      expect(article.city).toBeUndefined();
-      expect(article.region).toBeUndefined();
-      expect(article.country).toBe('Noruega');
       expect(article.tags).toEqual([]);
       expect(article.featured).toBe(false);
-      expect(article.coverImageUrl).toBeUndefined();
       expect(article.createdAt).toBeUndefined();
     });
 
@@ -125,22 +109,6 @@ describe('Article Aggregate Root', () => {
           endPage: 25.5,
         })
       ).toThrow('Article invariant violation: endPage must be greater than or equal to startPage.');
-    });
-
-    it('throws error when country is missing or too short', () => {
-      expect(() =>
-        Article.create({
-          ...validProps,
-          country: '',
-        })
-      ).toThrow('Article invariant violation: Country must be at least 2 characters long.');
-
-      expect(() =>
-        Article.create({
-          ...validProps,
-          country: 'A',
-        })
-      ).toThrow('Article invariant violation: Country must be at least 2 characters long.');
     });
 
     it('throws error when issue is missing or invalid', () => {
@@ -200,47 +168,14 @@ describe('Article Aggregate Root', () => {
       );
     });
 
-    it('formats location correctly with city, region, or country only', () => {
-      const withCity = Article.create({
-        ...validProps,
-        city: 'Cusco',
-        region: 'Andes',
-        country: 'Perú',
-      });
-      expect(withCity.getLocation()).toBe('Cusco · Perú');
+    it('maps correctly to DTO with cover image from issue', () => {
+      const article = Article.create(validProps);
+      const dto = article.toDTO();
 
-      const withRegionOnly = Article.create({
-        ...validProps,
-        city: undefined,
-        region: 'Patagonia',
-        country: 'Argentina',
-      });
-      expect(withRegionOnly.getLocation()).toBe('Patagonia · Argentina');
-
-      const withCountryOnly = Article.create({
-        ...validProps,
-        city: undefined,
-        region: undefined,
-        country: 'Japón',
-      });
-      expect(withCountryOnly.getLocation()).toBe('Japón');
-    });
-
-    it('maps correctly to DTO with fallback cover image from issue', () => {
-      const articleWithoutCover = Article.create({
-        ...validProps,
-        coverImageUrl: undefined,
-      });
-
-      const dto = articleWithoutCover.toDTO();
       expect(dto.id).toBe(100);
       expect(dto.title).toBe('Crónicas de los Andes');
-      expect(dto.location).toBe('Cusco · Perú');
-      expect(dto.city).toBe('Cusco');
-      expect(dto.region).toBe('Valle Sagrado');
-      expect(dto.country).toBe('Perú');
-      expect(dto.coverImageUrl).toBe(sampleIssue.coverImageUrl);
       expect(dto.magazine.name).toBe('National Geographic');
+      expect(dto.magazine.coverImageUrl).toBe(sampleIssue.coverImageUrl);
       expect(dto.magazine.fullCitation).toBe('National Geographic · Nº 315 (Noviembre 2021)');
     });
   });

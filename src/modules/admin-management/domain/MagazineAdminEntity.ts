@@ -12,7 +12,6 @@ export const MagazineInputSchema = z.object({
     .optional()
     .or(z.literal('')),
   description: z.string().trim().nullable().optional(),
-  coverImageUrl: z.string().trim().nullable().optional(),
 });
 
 export type MagazineInput = z.infer<typeof MagazineInputSchema>;
@@ -24,7 +23,6 @@ export interface MagazineAdminDTO {
   country?: string | null;
   issn?: string | null;
   description?: string | null;
-  coverImageUrl?: string | null;
   createdAt?: string | null;
   issuesCount?: number;
   articlesCount?: number;

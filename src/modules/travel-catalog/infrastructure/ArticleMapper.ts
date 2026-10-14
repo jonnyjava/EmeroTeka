@@ -9,17 +9,11 @@ export interface RawDatabaseArticleJoined {
     title: string;
     subtitle: string | null;
     author: string | null;
-    photographer: string | null;
     startPage: number;
     endPage: number;
-    city: string | null;
-    region: string | null;
-    country: string;
-    locationSearchIndex: string;
     synopsis: string;
     tags: string | null;
     featured: boolean | null;
-    coverImageUrl: string | null;
     createdAt: Date | null;
   };
   issue: {
@@ -28,7 +22,6 @@ export interface RawDatabaseArticleJoined {
     issueNumber: string;
     year: number;
     month: string | null;
-    volume: string | null;
     title: string | null;
     coverImageUrl: string | null;
   };
@@ -38,7 +31,6 @@ export interface RawDatabaseArticleJoined {
     publisher: string | null;
     country: string | null;
     description: string | null;
-    coverImageUrl: string | null;
   };
 }
 
@@ -55,9 +47,8 @@ export class ArticleMapper {
       issueNumber: raw.issue.issueNumber,
       year: raw.issue.year,
       month: raw.issue.month,
-      volume: raw.issue.volume,
       title: raw.issue.title,
-      coverImageUrl: raw.issue.coverImageUrl || raw.magazine.coverImageUrl,
+      coverImageUrl: raw.issue.coverImageUrl,
     });
 
     // 2. Parse tags
@@ -71,18 +62,12 @@ export class ArticleMapper {
       title: raw.article.title,
       subtitle: raw.article.subtitle,
       author: raw.article.author,
-      photographer: raw.article.photographer,
       startPage: raw.article.startPage,
       endPage: raw.article.endPage,
-      city: raw.article.city,
-      region: raw.article.region,
-      country: raw.article.country,
       issue,
       synopsis: raw.article.synopsis,
       tags: tagsArray,
       featured: raw.article.featured ?? false,
-      coverImageUrl:
-        raw.article.coverImageUrl || raw.issue.coverImageUrl || raw.magazine.coverImageUrl,
       createdAt: raw.article.createdAt,
     });
   }
