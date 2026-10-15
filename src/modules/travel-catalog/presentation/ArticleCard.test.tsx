@@ -25,15 +25,10 @@ describe('ArticleCard Component', () => {
     title: 'Navegando el Nilo',
     subtitle: 'De Lúxor a Asuán en falúa tradicional',
     author: 'Howard Carter',
-    photographer: 'Harry Burton',
     startPage: 24,
     endPage: 38,
     pageCount: 15,
     pageCitation: 'pp. 24–38',
-    city: 'Lúxor',
-    region: 'Alto Egipto',
-    country: 'Egipto',
-    location: 'Lúxor · Egipto',
     magazine: {
       id: 1,
       name: 'National Geographic',
@@ -41,22 +36,21 @@ describe('ArticleCard Component', () => {
       year: 2019,
       month: 'Octubre',
       fullCitation: 'National Geographic · Nº 290 (Octubre 2019)',
+      coverImageUrl: 'https://images.unsplash.com/nile.jpg',
     },
     synopsis: 'Crónica del descubrimiento de tumbas y navegación fluvial en Egipto.',
     tags: ['Egipto', 'Arqueología', 'Nilo'],
     featured: true,
-    coverImageUrl: 'https://images.unsplash.com/nile.jpg',
     catalogReference: 'National Geographic · Nº 290 (Octubre 2019) · pp. 24–38',
   };
 
-  it('renders article card with title, author, citation, and location badge', () => {
+  it('renders article card with title, author, and citation', () => {
     const handleSelect = vi.fn();
     render(<ArticleCard article={sampleArticle} onSelect={handleSelect} />);
 
     expect(screen.getByText('Navegando el Nilo')).toBeInTheDocument();
     expect(screen.getByText('De Lúxor a Asuán en falúa tradicional')).toBeInTheDocument();
     expect(screen.getByText('Howard Carter')).toBeInTheDocument();
-    expect(screen.getByText('Lúxor · Egipto')).toBeInTheDocument();
     expect(screen.getByText('pp. 24–38')).toBeInTheDocument();
     expect(screen.getByText('Nº 290')).toBeInTheDocument();
 
@@ -68,7 +62,10 @@ describe('ArticleCard Component', () => {
   it('falls back to magazine initials when cover image is absent or fails to load', () => {
     const noImageArticle: ArticleDTO = {
       ...sampleArticle,
-      coverImageUrl: undefined,
+      magazine: {
+        ...sampleArticle.magazine,
+        coverImageUrl: undefined,
+      },
       author: undefined,
       subtitle: undefined,
     };

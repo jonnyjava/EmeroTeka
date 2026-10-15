@@ -42,7 +42,6 @@ export function MagazineManagementSection() {
     country: '',
     issn: '',
     description: '',
-    coverImageUrl: '',
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
@@ -84,7 +83,6 @@ export function MagazineManagementSection() {
       country: '',
       issn: '',
       description: '',
-      coverImageUrl: '',
     });
     setFormErrors({});
     setIsModalOpen(true);
@@ -99,7 +97,6 @@ export function MagazineManagementSection() {
       country: mag.country || '',
       issn: mag.issn || '',
       description: mag.description || '',
-      coverImageUrl: mag.coverImageUrl || '',
     });
     setFormErrors({});
     setIsModalOpen(true);
@@ -419,37 +416,22 @@ export function MagazineManagementSection() {
                 </div>
               </div>
 
-              {/* ISSN & Cover Image */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
-                    Código ISSN
-                  </label>
-                  <Input
-                    data-testid="magazine-form-issn"
-                    type="text"
-                    placeholder="ej. 0027-9358"
-                    value={formData.issn || ''}
-                    onChange={(e) => setFormData({ ...formData, issn: e.target.value })}
-                    className="text-xs font-mono rounded-none"
-                  />
-                  {formErrors.issn && (
-                    <p className="text-[11px] text-rose-600 mt-1 font-sans">{formErrors.issn}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
-                    URL Portada / Logo
-                  </label>
-                  <Input
-                    data-testid="magazine-form-cover"
-                    type="text"
-                    placeholder="https://... o /images/..."
-                    value={formData.coverImageUrl || ''}
-                    onChange={(e) => setFormData({ ...formData, coverImageUrl: e.target.value })}
-                    className="text-xs font-mono rounded-none"
-                  />
-                </div>
+              {/* ISSN */}
+              <div>
+                <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
+                  Código ISSN
+                </label>
+                <Input
+                  data-testid="magazine-form-issn"
+                  type="text"
+                  placeholder="ej. 0027-9358"
+                  value={formData.issn || ''}
+                  onChange={(e) => setFormData({ ...formData, issn: e.target.value })}
+                  className="text-xs font-mono rounded-none"
+                />
+                {formErrors.issn && (
+                  <p className="text-[11px] text-rose-600 mt-1 font-sans">{formErrors.issn}</p>
+                )}
               </div>
 
               {/* Description */}

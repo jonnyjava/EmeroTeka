@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { X, Copy, Check, MapPin, BookOpen, User, Camera, Calendar, FileText, Bookmark } from 'lucide-react';
+import { X, Copy, Check, BookOpen, User, FileText, Bookmark } from 'lucide-react';
 import { ArticleDTO } from '../domain/Article.ts';
 
 interface ArticleDetailModalProps {
@@ -19,7 +19,7 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
   if (!article) return null;
 
   // Generate standard bibliographic reference
-  const bibliographicCitation = `${article.author || 'Redacción'}. (${article.magazine.year}). "${article.title}". ${article.magazine.name}, ${article.magazine.issueNumber}, ${article.pageCitation}. Destino: ${article.location}.`;
+  const bibliographicCitation = `${article.author || 'Redacción'}. (${article.magazine.year}). "${article.title}". ${article.magazine.name}, ${article.magazine.issueNumber}, ${article.pageCitation}.`;
 
   const handleCopyCitation = () => {
     navigator.clipboard.writeText(bibliographicCitation);
@@ -93,34 +93,28 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
             )}
           </div>
 
-          {/* Quick Destination & Pagination Highlight Strip */}
+          {/* Quick Magazine & Pagination Highlight Strip */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4.5 bg-[#F8FAFC] border-2 border-[#DCE2EE] rounded-xl">
             <div className="flex items-start gap-3">
               <div className="p-2 bg-[#2A3E92] text-white rounded-lg shrink-0 mt-0.5 shadow-2xs">
-                <MapPin className="w-4 h-4 text-[#FFC72C]" />
+                <BookOpen className="w-4 h-4 text-[#FFC72C]" />
               </div>
               <div>
                 <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] block font-bold">
-                  Destino Geográfico
+                  Publicación & Ejemplar
                 </span>
                 <span className="text-base font-bold text-[#1B275E] block font-serif">
-                  {article.location}
+                  {article.magazine.name}
                 </span>
                 <span className="text-xs text-slate-500">
-                  {[
-                    article.city && `Ciudad: ${article.city}`,
-                    article.region && `Región: ${article.region}`,
-                    article.country && `País: ${article.country}`,
-                  ]
-                    .filter(Boolean)
-                    .join(' · ')}
+                  {article.magazine.fullCitation}
                 </span>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
               <div className="p-2 bg-[#EEF2FF] text-[#2A3E92] border border-[#CCD5EE] rounded-lg shrink-0 mt-0.5 shadow-2xs">
-                <BookOpen className="w-4 h-4 text-[#2A3E92]" />
+                <FileText className="w-4 h-4 text-[#2A3E92]" />
               </div>
               <div>
                 <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] block font-bold">
@@ -130,7 +124,7 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
                   Páginas {article.startPage} a {article.endPage} ({article.pageCount} páginas)
                 </span>
                 <span className="text-xs text-slate-500">
-                  {article.magazine.fullCitation}
+                  {article.pageCitation}
                 </span>
               </div>
             </div>
@@ -156,9 +150,9 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
             </div>
 
             <div className="flex items-center gap-2 text-slate-600">
-              <Camera className="w-4 h-4 text-[#2A3E92]" />
+              <BookOpen className="w-4 h-4 text-[#2A3E92]" />
               <span>
-                <strong>Fotografía:</strong> {article.photographer || 'Archivo de la Revista'}
+                <strong>Referencia:</strong> {article.catalogReference}
               </span>
             </div>
           </div>

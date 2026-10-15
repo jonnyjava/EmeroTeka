@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { MapPin, User, ArrowUpRight } from 'lucide-react';
+import { BookOpen, User, ArrowUpRight } from 'lucide-react';
 import { ArticleDTO } from '../domain/Article.ts';
 
 interface ArticleCardProps {
@@ -20,6 +20,8 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onSelect }) =
     .slice(0, 2)
     .join('');
 
+  const displayCover = article.magazine.coverImageUrl;
+
   return (
     <article
       onClick={() => onSelect(article)}
@@ -27,10 +29,10 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onSelect }) =
     >
       {/* Visual Header / Cover Image Slot with Strict Fallback */}
       <div className="relative w-full h-48 bg-[#1B275E] overflow-hidden border-b border-[#DCE2EE]">
-        {article.coverImageUrl && !imageFailed ? (
+        {displayCover && !imageFailed ? (
           <Image
-            src={article.coverImageUrl}
-            alt={`Portada de ${article.magazine.name} sobre ${article.location}`}
+            src={displayCover}
+            alt={`Portada de ${article.magazine.name}`}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             referrerPolicy="no-referrer"
@@ -51,11 +53,11 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onSelect }) =
         {/* Editorial Scrim Overlay for Contrast */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#141E46]/90 via-[#1B275E]/30 to-transparent pointer-events-none" />
 
-        {/* Location Tag on Visual */}
+        {/* Magazine Issue & Page Tag on Visual */}
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
           <div className="flex items-center gap-1.5 font-bold drop-shadow-xs bg-[#2A3E92]/90 px-2 py-0.5 rounded border border-white/20">
-            <MapPin className="w-3.5 h-3.5 text-[#FFC72C]" />
-            <span className="truncate">{article.location}</span>
+            <BookOpen className="w-3.5 h-3.5 text-[#FFC72C]" />
+            <span className="truncate">{article.magazine.name}</span>
           </div>
 
           <span className="font-mono text-[11px] bg-[#141E46]/90 backdrop-blur-xs px-2 py-0.5 rounded text-white tabular-nums border border-white/20 font-bold">

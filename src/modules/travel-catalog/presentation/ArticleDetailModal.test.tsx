@@ -10,15 +10,10 @@ describe('ArticleDetailModal Component', () => {
     title: 'Petra Entre Sombras y Rocas',
     subtitle: 'Arqueología nabatea en el Siq',
     author: 'Johann Burckhardt',
-    photographer: 'David Roberts',
     startPage: 18,
     endPage: 34,
     pageCount: 17,
     pageCitation: 'pp. 18–34',
-    city: 'Petra',
-    region: 'Ma\'an',
-    country: 'Jordania',
-    location: 'Petra · Jordania',
     magazine: {
       id: 2,
       name: 'Altaïr Magazine',
@@ -30,7 +25,6 @@ describe('ArticleDetailModal Component', () => {
     synopsis: 'Exploración arqueológica y etnográfica en el cañón de Petra.',
     tags: ['Arqueología', 'Jordania', 'Nabateos'],
     featured: true,
-    coverImageUrl: 'https://images.unsplash.com/petra.jpg',
     catalogReference: 'Altaïr Magazine · Nº 112 (Abril 2020) · pp. 18–34',
   };
 
@@ -39,16 +33,15 @@ describe('ArticleDetailModal Component', () => {
     expect(container.firstChild).toBeNull();
   });
 
-  it('renders full article details, location, pagination, and credits', () => {
+  it('renders full article details, pagination, and credits', () => {
     const handleClose = vi.fn();
     render(<ArticleDetailModal article={sampleArticle} onClose={handleClose} />);
 
     expect(screen.getByText('Petra Entre Sombras y Rocas')).toBeInTheDocument();
     expect(screen.getByText('Arqueología nabatea en el Siq')).toBeInTheDocument();
     expect(screen.getByText('Ref. #42')).toBeInTheDocument();
-    expect(screen.getByText('Petra · Jordania')).toBeInTheDocument();
+    expect(screen.getAllByText('Altaïr Magazine').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/Johann Burckhardt/).length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText(/David Roberts/).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Páginas 18 a 34 (17 páginas)')).toBeInTheDocument();
     expect(screen.getByText('Nabateos')).toBeInTheDocument();
 

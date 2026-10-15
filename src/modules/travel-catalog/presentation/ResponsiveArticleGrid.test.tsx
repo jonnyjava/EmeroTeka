@@ -29,9 +29,6 @@ describe('ResponsiveArticleGrid Component', () => {
     endPage: 24,
     pageCount: 15,
     pageCitation: 'pp. 10–24',
-    city: 'Merzouga',
-    country: 'Marruecos',
-    location: 'Merzouga · Marruecos',
     magazine: {
       id: 1,
       name: 'Lonely Planet Magazine',
@@ -39,11 +36,11 @@ describe('ResponsiveArticleGrid Component', () => {
       year: 2021,
       month: 'Mayo',
       fullCitation: 'Lonely Planet Magazine · Nº 88 (Mayo 2021)',
+      coverImageUrl: 'https://images.unsplash.com/sahara.jpg',
     },
     synopsis: 'Exploración del desierto del Sahara marroquí.',
     tags: ['Desierto', 'Sahara'],
     featured: true,
-    coverImageUrl: 'https://images.unsplash.com/sahara.jpg',
     catalogReference: 'Lonely Planet Magazine · Nº 88 (Mayo 2021) · pp. 10–24',
   };
 
@@ -54,9 +51,6 @@ describe('ResponsiveArticleGrid Component', () => {
     endPage: 45,
     pageCount: 16,
     pageCitation: 'pp. 30–45',
-    city: 'Kioto',
-    country: 'Japón',
-    location: 'Kioto · Japón',
     magazine: {
       id: 2,
       name: 'National Geographic',
@@ -81,8 +75,8 @@ describe('ResponsiveArticleGrid Component', () => {
 
     expect(screen.getByText('Travesía por el Sahara')).toBeInTheDocument();
     expect(screen.getByText('Kioto y sus Templos Ocultos')).toBeInTheDocument();
-    expect(screen.getByText('Merzouga · Marruecos')).toBeInTheDocument();
-    expect(screen.getByText('Kioto · Japón')).toBeInTheDocument();
+    expect(screen.getByText('Lonely Planet Magazine · pp. 10–24')).toBeInTheDocument();
+    expect(screen.getByText('National Geographic · pp. 30–45')).toBeInTheDocument();
     expect(screen.getByText('LP Official')).toBeInTheDocument();
 
     const firstCardTitle = screen.getByText('Travesía por el Sahara');

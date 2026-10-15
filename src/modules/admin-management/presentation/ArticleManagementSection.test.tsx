@@ -54,17 +54,11 @@ describe('ArticleManagementSection Component', () => {
       title: 'El Valle de los Reyes Oculto',
       subtitle: 'Nuevos túneles dinásticos',
       author: 'Howard Vance',
-      photographer: 'Elena Rostova',
       startPage: 34,
       endPage: 52,
-      city: 'Luxor',
-      region: 'Alto Egipto',
-      country: 'Egipto',
-      locationSearchIndex: 'Luxor, Alto Egipto, Egipto',
       synopsis: 'Exploración de las cámaras no cartografiadas de la tumba KV63.',
-      tags: 'egipto, arqueologia, faraones',
+      tags: 'arqueologia, faraones',
       featured: true,
-      coverImageUrl: 'https://example.com/luxor.jpg',
     },
   ];
 
@@ -131,9 +125,6 @@ describe('ArticleManagementSection Component', () => {
     fireEvent.change(screen.getByTestId('article-form-title'), {
       target: { value: 'Ruta por la Selva Negra' },
     });
-    fireEvent.change(screen.getByTestId('article-form-country'), {
-      target: { value: 'Alemania' },
-    });
     fireEvent.change(screen.getByTestId('article-form-synopsis'), {
       target: { value: 'Una guía detallada de senderos ancestrales y molinos históricos.' },
     });
@@ -144,7 +135,6 @@ describe('ArticleManagementSection Component', () => {
       expect(adminActions.createAdminArticleAction).toHaveBeenCalledWith(
         expect.objectContaining({
           title: 'Ruta por la Selva Negra',
-          country: 'Alemania',
         })
       );
     });

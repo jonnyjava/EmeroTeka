@@ -18,8 +18,7 @@ describe('SearchArticlesUseCase Application Service', () => {
     title: 'Roma Antigua y Monumental',
     startPage: 10,
     endPage: 25,
-    city: 'Roma',
-    country: 'Italia',
+    tags: ['Roma', 'Italia'],
     issue: sampleIssue,
     synopsis: 'Exploración del Foro Romano y el Coliseo.',
   });
@@ -29,8 +28,7 @@ describe('SearchArticlesUseCase Application Service', () => {
     title: 'Secretos del Vaticano',
     startPage: 30,
     endPage: 40,
-    city: 'Roma',
-    country: 'Italia',
+    tags: ['Roma', 'Italia'],
     issue: sampleIssue,
     synopsis: 'Arte y misterios en la basílica de San Pedro.',
   });
@@ -40,8 +38,7 @@ describe('SearchArticlesUseCase Application Service', () => {
     title: 'Florencia Renacentista',
     startPage: 42,
     endPage: 50,
-    city: 'Florencia',
-    country: 'Italia',
+    tags: ['Florencia', 'Italia'],
     issue: sampleIssue,
     synopsis: 'La cuna del Renacimiento y la Galería Uffizi.',
   });
@@ -73,7 +70,7 @@ describe('SearchArticlesUseCase Application Service', () => {
     expect(response.articles.length).toBe(3);
     expect(response.isEmpty).toBe(false);
 
-    expect(response.matchedDestinations).toEqual(['Roma · Italia', 'Florencia · Italia']);
+    expect(response.matchedDestinations).toEqual(['Roma', 'Italia', 'Florencia']);
     expect(mockRepo.searchArticles).toHaveBeenCalledWith({
       query: 'Italia',
       magazineId: 10,

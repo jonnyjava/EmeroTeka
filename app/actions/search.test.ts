@@ -130,7 +130,6 @@ describe('Server Actions: search.ts', () => {
       title: 'Mares del Sur',
       startPage: 10,
       endPage: 20,
-      country: 'Polinesia',
       issue: sampleIssue,
       synopsis: 'Navegaciones por los atolones de coral.',
     });
@@ -142,7 +141,6 @@ describe('Server Actions: search.ts', () => {
       expect(result).not.toBeNull();
       expect(result?.id).toBe(123);
       expect(result?.title).toBe('Mares del Sur');
-      expect(result?.location).toBe('Polinesia');
     });
 
     it('returns null when article is not found', async () => {

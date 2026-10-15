@@ -8,7 +8,6 @@ import {
 import {
   ArticleAdminDTO,
   ArticleInput,
-  buildLocationSearchIndex,
   MagazineIssueOptionDTO,
 } from '../domain/ArticleAdminEntity';
 import { IAdminManagementRepository } from './IAdminManagementRepository';
@@ -40,7 +39,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
         country: magazines.country,
         issn: magazines.issn,
         description: magazines.description,
-        coverImageUrl: magazines.coverImageUrl,
         createdAt: magazines.createdAt,
       })
       .from(magazines)
@@ -74,7 +72,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       country: r.country,
       issn: r.issn,
       description: r.description,
-      coverImageUrl: r.coverImageUrl,
       createdAt: r.createdAt ? r.createdAt.toISOString() : null,
       issuesCount: issueMap.get(r.id) || 0,
       articlesCount: articleMap.get(r.id) || 0,
@@ -98,7 +95,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       country: r.country,
       issn: r.issn,
       description: r.description,
-      coverImageUrl: r.coverImageUrl,
       createdAt: r.createdAt ? r.createdAt.toISOString() : null,
     };
   }
@@ -112,7 +108,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
         country: input.country?.trim() || null,
         issn: input.issn?.trim() || null,
         description: input.description?.trim() || null,
-        coverImageUrl: input.coverImageUrl?.trim() || null,
       })
       .returning();
 
@@ -123,7 +118,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       country: inserted.country,
       issn: inserted.issn,
       description: inserted.description,
-      coverImageUrl: inserted.coverImageUrl,
       createdAt: inserted.createdAt ? inserted.createdAt.toISOString() : null,
       issuesCount: 0,
       articlesCount: 0,
@@ -139,7 +133,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
         country: input.country?.trim() || null,
         issn: input.issn?.trim() || null,
         description: input.description?.trim() || null,
-        coverImageUrl: input.coverImageUrl?.trim() || null,
       })
       .where(eq(magazines.id, id))
       .returning();
@@ -155,7 +148,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       country: updated.country,
       issn: updated.issn,
       description: updated.description,
-      coverImageUrl: updated.coverImageUrl,
       createdAt: updated.createdAt ? updated.createdAt.toISOString() : null,
     };
   }
@@ -179,11 +171,10 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       conditions.push(
         or(
           ilike(articles.title, pattern),
+          ilike(articles.subtitle, pattern),
           ilike(articles.author, pattern),
-          ilike(articles.country, pattern),
-          ilike(articles.city, pattern),
-          ilike(articles.region, pattern),
-          ilike(articles.locationSearchIndex, pattern)
+          ilike(articles.synopsis, pattern),
+          ilike(articles.tags, pattern)
         )
       );
     }
@@ -217,17 +208,11 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       title: article.title,
       subtitle: article.subtitle,
       author: article.author,
-      photographer: article.photographer,
       startPage: article.startPage,
       endPage: article.endPage,
-      city: article.city,
-      region: article.region,
-      country: article.country,
-      locationSearchIndex: article.locationSearchIndex,
       synopsis: article.synopsis,
       tags: article.tags,
       featured: Boolean(article.featured),
-      coverImageUrl: article.coverImageUrl,
       createdAt: article.createdAt ? article.createdAt.toISOString() : null,
     }));
   }
@@ -259,24 +244,16 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       title: article.title,
       subtitle: article.subtitle,
       author: article.author,
-      photographer: article.photographer,
       startPage: article.startPage,
       endPage: article.endPage,
-      city: article.city,
-      region: article.region,
-      country: article.country,
-      locationSearchIndex: article.locationSearchIndex,
       synopsis: article.synopsis,
       tags: article.tags,
       featured: Boolean(article.featured),
-      coverImageUrl: article.coverImageUrl,
       createdAt: article.createdAt ? article.createdAt.toISOString() : null,
     };
   }
 
   async createArticle(input: ArticleInput): Promise<ArticleAdminDTO> {
-    const locationIndex = buildLocationSearchIndex(input.city, input.region, input.country);
-
     const [inserted] = await db
       .insert(articles)
       .values({
@@ -285,17 +262,11 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
         title: input.title.trim(),
         subtitle: input.subtitle?.trim() || null,
         author: input.author?.trim() || null,
-        photographer: input.photographer?.trim() || null,
         startPage: input.startPage,
         endPage: input.endPage,
-        city: input.city?.trim() || null,
-        region: input.region?.trim() || null,
-        country: input.country.trim(),
-        locationSearchIndex: locationIndex,
         synopsis: input.synopsis.trim(),
         tags: input.tags?.trim() || null,
         featured: Boolean(input.featured),
-        coverImageUrl: input.coverImageUrl?.trim() || null,
       })
       .returning();
 
@@ -308,8 +279,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
   }
 
   async updateArticle(id: number, input: ArticleInput): Promise<ArticleAdminDTO> {
-    const locationIndex = buildLocationSearchIndex(input.city, input.region, input.country);
-
     const [updated] = await db
       .update(articles)
       .set({
@@ -318,17 +287,11 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
         title: input.title.trim(),
         subtitle: input.subtitle?.trim() || null,
         author: input.author?.trim() || null,
-        photographer: input.photographer?.trim() || null,
         startPage: input.startPage,
         endPage: input.endPage,
-        city: input.city?.trim() || null,
-        region: input.region?.trim() || null,
-        country: input.country.trim(),
-        locationSearchIndex: locationIndex,
         synopsis: input.synopsis.trim(),
         tags: input.tags?.trim() || null,
         featured: Boolean(input.featured),
-        coverImageUrl: input.coverImageUrl?.trim() || null,
       })
       .where(eq(articles.id, id))
       .returning();

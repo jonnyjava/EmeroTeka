@@ -103,9 +103,9 @@ const IndexedMagazineCard: React.FC<IndexedMagazineCardProps> = ({
       {/* 1. SIMULATED MAGAZINE COVER (PORTADA SIMULADA ESTILO LONELY PLANET) */}
       <div className="relative w-full h-64 sm:h-72 bg-[#1B275E] overflow-hidden">
         {/* Cover Image Background */}
-        {article.coverImageUrl && !imageError ? (
+        {article.magazine.coverImageUrl && !imageError ? (
           <Image
-            src={article.coverImageUrl}
+            src={article.magazine.coverImageUrl}
             alt={`Portada simulada de ${article.magazine.name}`}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -162,19 +162,19 @@ const IndexedMagazineCard: React.FC<IndexedMagazineCardProps> = ({
           </div>
         </div>
 
-        {/* 2. DESTINO GEOGRÁFICO ENCONTRADO (DESTACADO EN ST TROPAZ #2A3E92) */}
+        {/* 2. REFERENCIA EDITORIAL DE LA REVISTA */}
         <div className="absolute bottom-3.5 left-4 right-4 z-10">
           <div className="bg-white/95 backdrop-blur-md border border-[#CCD5EE] rounded-xl p-3 shadow-lg flex items-center justify-between gap-2">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="p-2 rounded-lg bg-[#2A3E92] text-white shrink-0 shadow-xs">
-                <MapPin className="w-4 h-4 text-[#FFC72C]" />
+                <BookOpen className="w-4 h-4 text-[#FFC72C]" />
               </div>
               <div className="truncate">
                 <span className="text-[10px] font-mono uppercase tracking-wider text-[#2A3E92] block font-bold">
-                  Destino Encontrado
+                  Referencia de Hemeroteca
                 </span>
                 <span className="font-serif font-bold text-base text-[#1B275E] truncate block leading-tight">
-                  {article.location}
+                  {article.magazine.name} · {article.pageCitation}
                 </span>
               </div>
             </div>

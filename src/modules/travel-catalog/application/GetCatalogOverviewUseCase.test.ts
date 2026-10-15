@@ -33,8 +33,7 @@ describe('GetCatalogOverviewUseCase Application Service', () => {
     title: 'Misterios de Kioto',
     startPage: 12,
     endPage: 28,
-    city: 'Kioto',
-    country: 'Japón',
+    tags: ['Kioto', 'Japón'],
     issue: sampleIssue,
     synopsis: 'Templos zen y jardines tradicionales de Kioto.',
     featured: true,
@@ -56,7 +55,6 @@ describe('GetCatalogOverviewUseCase Application Service', () => {
     expect(result.featuredArticles.length).toBe(1);
     expect(result.featuredArticles[0].id).toBe(5);
     expect(result.featuredArticles[0].title).toBe('Misterios de Kioto');
-    expect(result.featuredArticles[0].location).toBe('Kioto · Japón');
     expect(result.popularDestinations).toEqual(['Kioto · Japón', 'Petra · Jordania']);
 
     expect(mockRepo.getMagazines).toHaveBeenCalledTimes(1);

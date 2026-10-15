@@ -40,11 +40,13 @@ export class SearchArticlesUseCase {
     // Map rich domain entities to data transfer objects (DTO)
     const articleDTOs = searchResult.articles.map((article) => article.toDTO());
 
-    // Extract unique destinations present in the results
+    // Extract unique tags/topics present in the results
     const destinationSet = new Set<string>();
     for (const item of articleDTOs) {
-      if (item.location) {
-        destinationSet.add(item.location);
+      if (item.tags) {
+        for (const tag of item.tags) {
+          destinationSet.add(tag);
+        }
       }
     }
 

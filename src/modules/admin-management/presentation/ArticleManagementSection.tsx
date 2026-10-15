@@ -11,7 +11,6 @@ import {
   AlertTriangle,
   X,
   CheckCircle2,
-  MapPin,
   Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -58,16 +57,11 @@ export function ArticleManagementSection() {
     title: '',
     subtitle: '',
     author: '',
-    photographer: '',
     startPage: 1,
     endPage: 10,
-    city: '',
-    region: '',
-    country: '',
     synopsis: '',
     tags: '',
     featured: false,
-    coverImageUrl: '',
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
@@ -149,16 +143,11 @@ export function ArticleManagementSection() {
       title: '',
       subtitle: '',
       author: '',
-      photographer: '',
       startPage: 1,
       endPage: 10,
-      city: '',
-      region: '',
-      country: '',
       synopsis: '',
       tags: '',
       featured: false,
-      coverImageUrl: '',
     });
     setFormErrors({});
     setIsModalOpen(true);
@@ -173,16 +162,11 @@ export function ArticleManagementSection() {
       title: art.title,
       subtitle: art.subtitle || '',
       author: art.author || '',
-      photographer: art.photographer || '',
       startPage: art.startPage,
       endPage: art.endPage,
-      city: art.city || '',
-      region: art.region || '',
-      country: art.country,
       synopsis: art.synopsis,
       tags: art.tags || '',
       featured: Boolean(art.featured),
-      coverImageUrl: art.coverImageUrl || '',
     });
     setFormErrors({});
     setIsModalOpen(true);
@@ -275,7 +259,7 @@ export function ArticleManagementSection() {
             </h2>
           </div>
           <p className="text-xs text-[#64748B] mt-1 font-sans">
-            Crea, edita y administra los artículos indexados por destino geográfico, páginas y publicación.
+            Crea, edita y administra los artículos indexados por publicación y rango de páginas.
           </p>
         </div>
 
@@ -333,7 +317,7 @@ export function ArticleManagementSection() {
           <Input
             data-testid="article-search-input"
             type="text"
-            placeholder="Buscar artículos por título, destino, autor o país..."
+            placeholder="Buscar artículos por título, autor o temática..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9 text-xs bg-white border-[#CBD5E1] rounded-none h-9 text-[#1B275E]"
@@ -385,7 +369,7 @@ export function ArticleManagementSection() {
               <tr className="bg-[#0E152E] text-white font-mono uppercase tracking-wider text-[10px] border-b border-[#23356E]">
                 <th className="py-3 px-4">Artículo</th>
                 <th className="py-3 px-4">Publicación & Edición</th>
-                <th className="py-3 px-4">Destino Geográfico</th>
+                <th className="py-3 px-4">Sinopsis</th>
                 <th className="py-3 px-4">Páginas</th>
                 <th className="py-3 px-4 text-right">Acciones</th>
               </tr>
@@ -417,11 +401,9 @@ export function ArticleManagementSection() {
                           {art.subtitle}
                         </span>
                       )}
-                      {(art.author || art.photographer) && (
+                      {art.author && (
                         <span className="text-[10px] font-mono text-[#94A3B8] mt-1">
-                          {art.author ? `Por ${art.author}` : ''}
-                          {art.author && art.photographer ? ' · ' : ''}
-                          {art.photographer ? `Fotos: ${art.photographer}` : ''}
+                          Por {art.author}
                         </span>
                       )}
                     </div>
@@ -433,17 +415,11 @@ export function ArticleManagementSection() {
                       {art.issueMonth ? ` · ${art.issueMonth}` : ''})
                     </div>
                   </td>
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-1.5 text-[#334155]">
-                      <MapPin className="w-3.5 h-3.5 text-[#D2A446] shrink-0" />
-                      <span className="font-medium">
-                        {art.city ? `${art.city}, ` : ''}
-                        {art.country}
-                      </span>
-                    </div>
-                    {art.region && (
-                      <span className="text-[10px] font-mono text-[#64748B] block ml-5">
-                        {art.region}
+                  <td className="py-3 px-4 max-w-xs">
+                    <p className="text-xs text-[#475569] line-clamp-2">{art.synopsis}</p>
+                    {art.tags && (
+                      <span className="text-[10px] font-mono text-[#94A3B8] block mt-1">
+                        {art.tags}
                       </span>
                     )}
                   </td>
@@ -642,53 +618,6 @@ export function ArticleManagementSection() {
                 </div>
               </div>
 
-              {/* Location Fields */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
-                    Ciudad / Localidad
-                  </label>
-                  <Input
-                    data-testid="article-form-city"
-                    type="text"
-                    placeholder="ej. Kioto, Luxor, Cusco..."
-                    value={formData.city || ''}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="text-xs rounded-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
-                    Región / Estado
-                  </label>
-                  <Input
-                    data-testid="article-form-region"
-                    type="text"
-                    placeholder="ej. Kansai, Alto Egipto, Andes..."
-                    value={formData.region || ''}
-                    onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                    className="text-xs rounded-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-mono uppercase text-[#334155] mb-1 font-semibold">
-                    País *
-                  </label>
-                  <Input
-                    data-testid="article-form-country"
-                    type="text"
-                    required
-                    placeholder="ej. Japón, Egipto, Perú..."
-                    value={formData.country}
-                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                    className="text-xs rounded-none"
-                  />
-                  {formErrors.country && (
-                    <p className="text-[11px] text-rose-600 mt-1">{formErrors.country}</p>
-                  )}
-                </div>
-              </div>
-
               {/* Synopsis */}
               <div>
                 <label className="block text-xs font-mono uppercase text-[#334155] mb-1 font-semibold">
@@ -698,7 +627,7 @@ export function ArticleManagementSection() {
                   data-testid="article-form-synopsis"
                   required
                   rows={3}
-                  placeholder="Resumen del reportaje, descubrimientos arqueológicos, rutas o cronología documental..."
+                  placeholder="Resumen del reportaje, descubrimientos, rutas o cronología documental..."
                   value={formData.synopsis}
                   onChange={(e) => setFormData({ ...formData, synopsis: e.target.value })}
                   className="w-full text-xs p-2 border border-[#CBD5E1] rounded-none focus:outline-hidden focus:border-[#1B275E] text-[#1B275E]"
@@ -708,34 +637,19 @@ export function ArticleManagementSection() {
                 )}
               </div>
 
-              {/* Tags & Cover & Featured */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
-                    Etiquetas / Tags
-                  </label>
-                  <Input
-                    data-testid="article-form-tags"
-                    type="text"
-                    placeholder="separadas por coma (ej. templos, arqueologia, sintoísmo)"
-                    value={formData.tags || ''}
-                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                    className="text-xs rounded-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
-                    URL Imagen de Portada
-                  </label>
-                  <Input
-                    data-testid="article-form-cover"
-                    type="text"
-                    placeholder="https://... o /images/..."
-                    value={formData.coverImageUrl || ''}
-                    onChange={(e) => setFormData({ ...formData, coverImageUrl: e.target.value })}
-                    className="text-xs font-mono rounded-none"
-                  />
-                </div>
+              {/* Tags & Featured */}
+              <div>
+                <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
+                  Etiquetas / Tags
+                </label>
+                <Input
+                  data-testid="article-form-tags"
+                  type="text"
+                  placeholder="separadas por coma (ej. expedición, historia, arqueología)"
+                  value={formData.tags || ''}
+                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                  className="text-xs rounded-none"
+                />
               </div>
 
               <div className="flex items-center gap-2 pt-2">

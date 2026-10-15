@@ -9,7 +9,6 @@ describe('MagazineAdminEntity Domain Model', () => {
       country: 'España',
       issn: '1234-5678',
       description: 'Revista dedicada a reportajes de expedición.',
-      coverImageUrl: 'https://example.com/cover.jpg',
     };
 
     const result = MagazineInputSchema.safeParse(valid);
