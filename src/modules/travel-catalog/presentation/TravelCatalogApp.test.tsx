@@ -45,9 +45,6 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
     endPage: 28,
     pageCount: 17,
     pageCitation: 'pp. 12–28',
-    city: 'Svalbard',
-    country: 'Noruega',
-    location: 'Svalbard · Noruega',
     magazine: {
       id: 1,
       name: 'National Geographic',

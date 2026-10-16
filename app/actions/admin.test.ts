@@ -12,6 +12,8 @@ import {
 } from './admin';
 import { ManageMagazinesUseCase } from '@/src/modules/admin-management/application/ManageMagazinesUseCase';
 import { ManageArticlesUseCase } from '@/src/modules/admin-management/application/ManageArticlesUseCase';
+import { MagazineAdminDTO } from '@/src/modules/admin-management/domain/MagazineAdminEntity';
+import { ArticleAdminDTO, MagazineIssueOptionDTO } from '@/src/modules/admin-management/domain/ArticleAdminEntity';
 
 vi.mock('@/src/modules/admin-management/application/ManageMagazinesUseCase');
 vi.mock('@/src/modules/admin-management/application/ManageArticlesUseCase');

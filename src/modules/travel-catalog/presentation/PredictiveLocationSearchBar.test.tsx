@@ -17,6 +17,8 @@ describe('PredictiveLocationSearchBar Component', () => {
       <PredictiveLocationSearchBar
         query="Pet"
         onQueryChange={handleQueryChange}
+        onMagazineChange={vi.fn()}
+        onYearChange={vi.fn()}
         magazines={sampleMagazines}
         popularDestinations={sampleDestinations}
         totalResults={1}
@@ -46,6 +48,8 @@ describe('PredictiveLocationSearchBar Component', () => {
       <PredictiveLocationSearchBar
         query="P"
         onQueryChange={handleQueryChange}
+        onMagazineChange={vi.fn()}
+        onYearChange={vi.fn()}
         magazines={sampleMagazines}
         popularDestinations={sampleDestinations}
         totalResults={2}
@@ -165,6 +169,8 @@ describe('PredictiveLocationSearchBar Component', () => {
       <PredictiveLocationSearchBar
         query=""
         onQueryChange={handleQueryChange}
+        onMagazineChange={vi.fn()}
+        onYearChange={vi.fn()}
         magazines={sampleMagazines}
         popularDestinations={sampleDestinations}
         totalResults={3}
@@ -186,6 +192,8 @@ describe('PredictiveLocationSearchBar Component', () => {
       <PredictiveLocationSearchBar
         query="Kioto · Japón"
         onQueryChange={handleQueryChange}
+        onMagazineChange={vi.fn()}
+        onYearChange={vi.fn()}
         magazines={sampleMagazines}
         popularDestinations={sampleDestinations}
         totalResults={1}
