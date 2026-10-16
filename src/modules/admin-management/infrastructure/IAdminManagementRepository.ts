@@ -3,6 +3,10 @@ import {
   MagazineInput,
 } from '../domain/MagazineAdminEntity';
 import {
+  MagazineIssueAdminDTO,
+  MagazineIssueInput,
+} from '../domain/MagazineIssueAdminEntity';
+import {
   ArticleAdminDTO,
   ArticleInput,
   MagazineIssueOptionDTO,
@@ -15,6 +19,13 @@ export interface IAdminManagementRepository {
   createMagazine(input: MagazineInput): Promise<MagazineAdminDTO>;
   updateMagazine(id: number, input: MagazineInput): Promise<MagazineAdminDTO>;
   deleteMagazine(id: number): Promise<boolean>;
+
+  // Magazine Issues
+  listMagazineIssues(filter?: { search?: string; magazineId?: number }): Promise<MagazineIssueAdminDTO[]>;
+  getMagazineIssueById(id: number): Promise<MagazineIssueAdminDTO | null>;
+  createMagazineIssue(input: MagazineIssueInput): Promise<MagazineIssueAdminDTO>;
+  updateMagazineIssue(id: number, input: MagazineIssueInput): Promise<MagazineIssueAdminDTO>;
+  deleteMagazineIssue(id: number): Promise<boolean>;
 
   // Articles
   listArticles(filter?: { search?: string; magazineId?: number }): Promise<ArticleAdminDTO[]>;

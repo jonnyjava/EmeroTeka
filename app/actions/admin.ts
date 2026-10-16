@@ -2,8 +2,10 @@
 
 import { PostgresAdminManagementRepository } from '@/src/modules/admin-management/infrastructure/PostgresAdminManagementRepository';
 import { ManageMagazinesUseCase } from '@/src/modules/admin-management/application/ManageMagazinesUseCase';
+import { ManageMagazineIssuesUseCase } from '@/src/modules/admin-management/application/ManageMagazineIssuesUseCase';
 import { ManageArticlesUseCase } from '@/src/modules/admin-management/application/ManageArticlesUseCase';
 import { MagazineAdminDTO } from '@/src/modules/admin-management/domain/MagazineAdminEntity';
+import { MagazineIssueAdminDTO } from '@/src/modules/admin-management/domain/MagazineIssueAdminEntity';
 import {
   ArticleAdminDTO,
   MagazineIssueOptionDTO,
@@ -12,6 +14,7 @@ import {
 // Composition root for Admin Management Server Actions
 const adminRepository = new PostgresAdminManagementRepository();
 const manageMagazinesUseCase = new ManageMagazinesUseCase(adminRepository);
+const manageMagazineIssuesUseCase = new ManageMagazineIssuesUseCase(adminRepository);
 const manageArticlesUseCase = new ManageArticlesUseCase(adminRepository);
 
 export interface ServerActionResponse<T> {
@@ -71,6 +74,62 @@ export async function deleteAdminMagazineAction(
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Error al eliminar la revista.';
     console.error('deleteAdminMagazineAction error:', error);
+    return { success: false, error: message };
+  }
+}
+
+// ===================== MAGAZINE ISSUES ACTIONS =====================
+
+export async function getAdminMagazineIssuesAction(filter?: {
+  search?: string;
+  magazineId?: number;
+}): Promise<ServerActionResponse<MagazineIssueAdminDTO[]>> {
+  try {
+    const data = await manageMagazineIssuesUseCase.list(filter);
+    return { success: true, data };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener ediciones de revistas.';
+    console.error('getAdminMagazineIssuesAction error:', error);
+    return { success: false, error: message };
+  }
+}
+
+export async function createAdminMagazineIssueAction(
+  input: unknown
+): Promise<ServerActionResponse<MagazineIssueAdminDTO>> {
+  try {
+    const data = await manageMagazineIssuesUseCase.create(input);
+    return { success: true, data };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al crear la edición.';
+    console.error('createAdminMagazineIssueAction error:', error);
+    return { success: false, error: message };
+  }
+}
+
+export async function updateAdminMagazineIssueAction(
+  id: number,
+  input: unknown
+): Promise<ServerActionResponse<MagazineIssueAdminDTO>> {
+  try {
+    const data = await manageMagazineIssuesUseCase.update(id, input);
+    return { success: true, data };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al actualizar la edición.';
+    console.error('updateAdminMagazineIssueAction error:', error);
+    return { success: false, error: message };
+  }
+}
+
+export async function deleteAdminMagazineIssueAction(
+  id: number
+): Promise<ServerActionResponse<boolean>> {
+  try {
+    const success = await manageMagazineIssuesUseCase.delete(id);
+    return { success: true, data: success };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al eliminar la edición.';
+    console.error('deleteAdminMagazineIssueAction error:', error);
     return { success: false, error: message };
   }
 }

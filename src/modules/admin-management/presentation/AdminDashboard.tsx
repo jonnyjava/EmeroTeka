@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BookOpen, FileText, LogOut, ShieldCheck, UserCheck } from 'lucide-react';
+import { BookOpen, BookMarked, FileText, LogOut, ShieldCheck, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AdminUser } from '@/src/modules/admin-auth/domain/AdminUser';
 import { MagazineManagementSection } from './MagazineManagementSection';
+import { MagazineIssueManagementSection } from './MagazineIssueManagementSection';
 import { ArticleManagementSection } from './ArticleManagementSection';
 
 export interface AdminDashboardProps {
@@ -13,7 +14,7 @@ export interface AdminDashboardProps {
   onSignOut: () => void;
 }
 
-export type AdminTab = 'magazines' | 'articles';
+export type AdminTab = 'magazines' | 'issues' | 'articles';
 
 export function AdminDashboard({ user, onSignOut }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<AdminTab>('magazines');
@@ -79,11 +80,11 @@ export function AdminDashboard({ user, onSignOut }: AdminDashboardProps) {
       {/* Main Admin Content Container */}
       <main className="flex-1 max-w-7xl mx-auto w-full p-6 md:p-8 flex flex-col space-y-6">
         {/* Navigation Tabs */}
-        <div className="flex border-b border-[#CBD5E1] gap-1">
+        <div className="flex border-b border-[#CBD5E1] gap-1 overflow-x-auto">
           <button
             data-testid="admin-tab-magazines"
             onClick={() => setActiveTab('magazines')}
-            className={`flex items-center gap-2 px-5 py-3 text-xs font-mono uppercase tracking-wider border-b-2 font-bold cursor-pointer transition-colors ${
+            className={`flex items-center gap-2 px-5 py-3 text-xs font-mono uppercase tracking-wider border-b-2 font-bold cursor-pointer transition-colors shrink-0 ${
               activeTab === 'magazines'
                 ? 'border-[#1B275E] text-[#1B275E] bg-white'
                 : 'border-transparent text-[#64748B] hover:text-[#1B275E] hover:bg-[#F1F5F9]'
@@ -94,9 +95,22 @@ export function AdminDashboard({ user, onSignOut }: AdminDashboardProps) {
           </button>
 
           <button
+            data-testid="admin-tab-issues"
+            onClick={() => setActiveTab('issues')}
+            className={`flex items-center gap-2 px-5 py-3 text-xs font-mono uppercase tracking-wider border-b-2 font-bold cursor-pointer transition-colors shrink-0 ${
+              activeTab === 'issues'
+                ? 'border-[#1B275E] text-[#1B275E] bg-white'
+                : 'border-transparent text-[#64748B] hover:text-[#1B275E] hover:bg-[#F1F5F9]'
+            }`}
+          >
+            <BookMarked className="w-4 h-4 text-[#D2A446]" />
+            <span>Ediciones (Issues)</span>
+          </button>
+
+          <button
             data-testid="admin-tab-articles"
             onClick={() => setActiveTab('articles')}
-            className={`flex items-center gap-2 px-5 py-3 text-xs font-mono uppercase tracking-wider border-b-2 font-bold cursor-pointer transition-colors ${
+            className={`flex items-center gap-2 px-5 py-3 text-xs font-mono uppercase tracking-wider border-b-2 font-bold cursor-pointer transition-colors shrink-0 ${
               activeTab === 'articles'
                 ? 'border-[#1B275E] text-[#1B275E] bg-white'
                 : 'border-transparent text-[#64748B] hover:text-[#1B275E] hover:bg-[#F1F5F9]'
@@ -110,6 +124,7 @@ export function AdminDashboard({ user, onSignOut }: AdminDashboardProps) {
         {/* Tab Panels */}
         <div className="flex-1">
           {activeTab === 'magazines' && <MagazineManagementSection />}
+          {activeTab === 'issues' && <MagazineIssueManagementSection />}
           {activeTab === 'articles' && <ArticleManagementSection />}
         </div>
       </main>

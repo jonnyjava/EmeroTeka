@@ -6,6 +6,10 @@ import {
   MagazineInput,
 } from '../domain/MagazineAdminEntity';
 import {
+  MagazineIssueAdminDTO,
+  MagazineIssueInput,
+} from '../domain/MagazineIssueAdminEntity';
+import {
   ArticleAdminDTO,
   ArticleInput,
   MagazineIssueOptionDTO,
@@ -161,6 +165,150 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
     return deleted.length > 0;
   }
 
+  // ===================== MAGAZINE ISSUES =====================
+
+  async listMagazineIssues(filter?: { search?: string; magazineId?: number }): Promise<MagazineIssueAdminDTO[]> {
+    const conditions = [];
+
+    if (filter?.search && filter.search.trim()) {
+      const pattern = `%${filter.search.trim()}%`;
+      conditions.push(
+        or(
+          ilike(magazineIssues.issueNumber, pattern),
+          ilike(magazineIssues.title, pattern),
+          ilike(magazineIssues.month, pattern),
+          ilike(magazines.name, pattern)
+        )
+      );
+    }
+
+    if (filter?.magazineId) {
+      conditions.push(eq(magazineIssues.magazineId, filter.magazineId));
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const rows = await db
+      .select({
+        issue: magazineIssues,
+        magazine: magazines,
+      })
+      .from(magazineIssues)
+      .innerJoin(magazines, eq(magazineIssues.magazineId, magazines.id))
+      .where(whereClause)
+      .orderBy(desc(magazineIssues.year), desc(magazineIssues.id));
+
+    const articleCounts = await db
+      .select({
+        issueId: articles.issueId,
+        count: count(articles.id),
+      })
+      .from(articles)
+      .groupBy(articles.issueId);
+
+    const articleMap = new Map(articleCounts.map((r) => [r.issueId, Number(r.count)]));
+
+    return rows.map(({ issue, magazine }) => ({
+      id: issue.id,
+      magazineId: issue.magazineId,
+      magazineName: magazine.name,
+      issueNumber: issue.issueNumber,
+      year: issue.year,
+      month: issue.month,
+      title: issue.title,
+      coverImageUrl: issue.coverImageUrl,
+      createdAt: issue.createdAt ? issue.createdAt.toISOString() : null,
+      articlesCount: articleMap.get(issue.id) || 0,
+    }));
+  }
+
+  async getMagazineIssueById(id: number): Promise<MagazineIssueAdminDTO | null> {
+    const rows = await db
+      .select({
+        issue: magazineIssues,
+        magazine: magazines,
+      })
+      .from(magazineIssues)
+      .innerJoin(magazines, eq(magazineIssues.magazineId, magazines.id))
+      .where(eq(magazineIssues.id, id))
+      .limit(1);
+
+    if (rows.length === 0) return null;
+    const { issue, magazine } = rows[0];
+
+    const articleCounts = await db
+      .select({ count: count(articles.id) })
+      .from(articles)
+      .where(eq(articles.issueId, issue.id));
+
+    return {
+      id: issue.id,
+      magazineId: issue.magazineId,
+      magazineName: magazine.name,
+      issueNumber: issue.issueNumber,
+      year: issue.year,
+      month: issue.month,
+      title: issue.title,
+      coverImageUrl: issue.coverImageUrl,
+      createdAt: issue.createdAt ? issue.createdAt.toISOString() : null,
+      articlesCount: Number(articleCounts[0]?.count || 0),
+    };
+  }
+
+  async createMagazineIssue(input: MagazineIssueInput): Promise<MagazineIssueAdminDTO> {
+    const [inserted] = await db
+      .insert(magazineIssues)
+      .values({
+        magazineId: input.magazineId,
+        issueNumber: input.issueNumber.trim(),
+        year: input.year,
+        month: input.month?.trim() || null,
+        title: input.title?.trim() || null,
+        coverImageUrl: input.coverImageUrl?.trim() || null,
+      })
+      .returning();
+
+    const detail = await this.getMagazineIssueById(inserted.id);
+    if (!detail) {
+      throw new Error('Failed to retrieve newly created magazine issue.');
+    }
+    return detail;
+  }
+
+  async updateMagazineIssue(id: number, input: MagazineIssueInput): Promise<MagazineIssueAdminDTO> {
+    const [updated] = await db
+      .update(magazineIssues)
+      .set({
+        magazineId: input.magazineId,
+        issueNumber: input.issueNumber.trim(),
+        year: input.year,
+        month: input.month?.trim() || null,
+        title: input.title?.trim() || null,
+        coverImageUrl: input.coverImageUrl?.trim() || null,
+      })
+      .where(eq(magazineIssues.id, id))
+      .returning();
+
+    if (!updated) {
+      throw new Error(`Magazine issue with ID ${id} not found.`);
+    }
+
+    const detail = await this.getMagazineIssueById(updated.id);
+    if (!detail) {
+      throw new Error('Failed to retrieve updated magazine issue.');
+    }
+    return detail;
+  }
+
+  async deleteMagazineIssue(id: number): Promise<boolean> {
+    const deleted = await db
+      .delete(magazineIssues)
+      .where(eq(magazineIssues.id, id))
+      .returning({ id: magazineIssues.id });
+
+    return deleted.length > 0;
+  }
+
   // ===================== ARTICLES =====================
 
   async listArticles(filter?: { search?: string; magazineId?: number }): Promise<ArticleAdminDTO[]> {
@@ -270,7 +418,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       })
       .returning();
 
-    // Fetch joined details
     const detail = await this.getArticleById(inserted.id);
     if (!detail) {
       throw new Error('Failed to retrieve newly created article.');
