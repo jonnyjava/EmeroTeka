@@ -3,12 +3,18 @@ import * as dotenv from "dotenv";
 
 dotenv.config();
 
-const connectionString = process.env.POSTGRES_URL || process.env.POSTGRES_URL_NON_POOLING;
+const connectionString =
+  process.env.EMEROTK_POSTGRES_URL ||
+  process.env.emerotk_POSTGRES_URL ||
+  process.env.EMEROTK_POSTGRES_URL_NON_POOLING ||
+  process.env.emerotk_POSTGRES_URL_NON_POOLING ||
+  process.env.POSTGRES_URL ||
+  process.env.POSTGRES_URL_NON_POOLING;
 
-const sqlHost = process.env.SQL_HOST;
-const sqlDbName = process.env.SQL_DB_NAME;
-const user = process.env.SQL_ADMIN_USER;
-const password = process.env.SQL_ADMIN_PASSWORD;
+const sqlHost = process.env.EMEROTK_SQL_HOST || process.env.emerotk_SQL_HOST || process.env.SQL_HOST;
+const sqlDbName = process.env.EMEROTK_SQL_DB_NAME || process.env.emerotk_SQL_DB_NAME || process.env.SQL_DB_NAME;
+const user = process.env.EMEROTK_SQL_ADMIN_USER || process.env.emerotk_SQL_ADMIN_USER || process.env.EMEROTK_SQL_USER || process.env.emerotk_SQL_USER || process.env.SQL_ADMIN_USER || process.env.SQL_USER;
+const password = process.env.EMEROTK_SQL_ADMIN_PASSWORD || process.env.emerotk_SQL_ADMIN_PASSWORD || process.env.EMEROTK_SQL_PASSWORD || process.env.emerotk_SQL_PASSWORD || process.env.SQL_ADMIN_PASSWORD || process.env.SQL_PASSWORD;
 
 if (!connectionString) {
   if (!sqlHost) {
