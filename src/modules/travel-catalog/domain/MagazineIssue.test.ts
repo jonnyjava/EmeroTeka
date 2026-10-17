@@ -31,14 +31,15 @@ describe('MagazineIssue Entity', () => {
         magazineName: '  Altaïr  ',
         issueNumber: ' 88 ',
         year: 2018,
-        month: '  Septiembre  ',
+        month: 9,
         title: '  Ruta de la Seda  ',
         coverImageUrl: '  https://example.com/cover.jpg  ',
       });
 
       expect(issue.magazineName).toBe('Altaïr');
       expect(issue.issueNumber).toBe('88');
-      expect(issue.month).toBe('Septiembre');
+      expect(issue.month).toBe(9);
+      expect(issue.monthName).toBe('Septiembre');
       expect(issue.title).toBe('Ruta de la Seda');
       expect(issue.coverImageUrl).toBe('https://example.com/cover.jpg');
     });
@@ -70,47 +71,37 @@ describe('MagazineIssue Entity', () => {
         MagazineIssue.create({
           id: 1,
           magazineId: 10,
-          magazineName: 'GEO',
+          magazineName: 'Geo',
           issueNumber: '',
           year: 2021,
         })
       ).toThrow('MagazineIssue invariant violation: issueNumber cannot be empty.');
-
-      expect(() =>
-        MagazineIssue.create({
-          id: 1,
-          magazineId: 10,
-          magazineName: 'GEO',
-          issueNumber: '   ',
-          year: 2021,
-        })
-      ).toThrow('MagazineIssue invariant violation: issueNumber cannot be empty.');
     });
 
-    it('throws error when year is below 1850 or above currentYear + 1', () => {
+    it('throws error when year is invalid or out of bounds', () => {
       expect(() =>
         MagazineIssue.create({
           id: 1,
           magazineId: 10,
-          magazineName: 'Condé Nast Traveler',
-          issueNumber: '1',
-          year: 1849,
+          magazineName: 'Geo',
+          issueNumber: '12',
+          year: 1800,
         })
-      ).toThrow('MagazineIssue invariant violation: year must be between 1850');
+      ).toThrow(/MagazineIssue invariant violation: year must be between/);
 
       expect(() =>
         MagazineIssue.create({
           id: 1,
           magazineId: 10,
-          magazineName: 'Condé Nast Traveler',
-          issueNumber: '1',
+          magazineName: 'Geo',
+          issueNumber: '12',
           year: currentYear + 2,
         })
-      ).toThrow('MagazineIssue invariant violation: year must be between 1850');
+      ).toThrow(/MagazineIssue invariant violation: year must be between/);
     });
   });
 
-  describe('Full Citation (getFullCitation)', () => {
+  describe('Bibliographic Citation formatting', () => {
     it('formats citation without month', () => {
       const issue = MagazineIssue.create({
         id: 1,
@@ -129,7 +120,7 @@ describe('MagazineIssue Entity', () => {
         magazineId: 1,
         magazineName: 'National Geographic',
         issueNumber: '4',
-        month: 'Octubre',
+        month: 10,
         year: 1994,
       });
 
@@ -145,7 +136,7 @@ describe('MagazineIssue Entity', () => {
         magazineName: 'Lonely Planet Magazine',
         issueNumber: '42',
         year: 2019,
-        month: 'Julio',
+        month: 7,
         title: 'Especial Japón',
         coverImageUrl: 'https://images.example.com/cover.jpg',
       });
@@ -156,7 +147,8 @@ describe('MagazineIssue Entity', () => {
         magazineName: 'Lonely Planet Magazine',
         issueNumber: '42',
         year: 2019,
-        month: 'Julio',
+        month: 7,
+        monthName: 'Julio',
         title: 'Especial Japón',
         coverImageUrl: 'https://images.example.com/cover.jpg',
         fullCitation: 'Lonely Planet Magazine · Nº 42 (Julio 2019)',

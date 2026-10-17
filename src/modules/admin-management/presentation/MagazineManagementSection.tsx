@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { MagazineAdminDTO, MagazineInput, MagazineInputSchema } from '../domain/MagazineAdminEntity';
 import {
   getAdminMagazinesAction,
@@ -40,8 +39,6 @@ export function MagazineManagementSection() {
     name: '',
     publisher: '',
     country: '',
-    issn: '',
-    description: '',
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
@@ -81,8 +78,6 @@ export function MagazineManagementSection() {
       name: '',
       publisher: '',
       country: '',
-      issn: '',
-      description: '',
     });
     setFormErrors({});
     setIsModalOpen(true);
@@ -95,8 +90,6 @@ export function MagazineManagementSection() {
       name: mag.name,
       publisher: mag.publisher || '',
       country: mag.country || '',
-      issn: mag.issn || '',
-      description: mag.description || '',
     });
     setFormErrors({});
     setIsModalOpen(true);
@@ -238,7 +231,7 @@ export function MagazineManagementSection() {
         <Input
           data-testid="magazine-search-input"
           type="text"
-          placeholder="Buscar revistas por nombre, país, editorial o ISSN..."
+          placeholder="Buscar revistas por nombre, país o editorial..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9 text-xs bg-white border-[#CBD5E1] rounded-none h-9 text-[#1B275E]"
@@ -273,7 +266,6 @@ export function MagazineManagementSection() {
               <tr className="bg-[#0E152E] text-white font-mono uppercase tracking-wider text-[10px] border-b border-[#23356E]">
                 <th className="py-3 px-4">Revista</th>
                 <th className="py-3 px-4">Editorial & País</th>
-                <th className="py-3 px-4">ISSN</th>
                 <th className="py-3 px-4">Contenido</th>
                 <th className="py-3 px-4 text-right">Acciones</th>
               </tr>
@@ -286,27 +278,11 @@ export function MagazineManagementSection() {
                   className="hover:bg-[#F8FAFC] transition-colors"
                 >
                   <td className="py-3 px-4 font-serif font-bold text-[#1B275E]">
-                    <div className="flex flex-col">
-                      <span className="text-sm">{mag.name}</span>
-                      {mag.description && (
-                        <span className="font-sans font-normal text-[11px] text-[#64748B] line-clamp-1 max-w-xs mt-0.5">
-                          {mag.description}
-                        </span>
-                      )}
-                    </div>
+                    <span className="text-sm">{mag.name}</span>
                   </td>
                   <td className="py-3 px-4 font-sans text-[#334155]">
                     <div>{mag.publisher || '—'}</div>
                     <div className="text-[11px] text-[#64748B]">{mag.country || '—'}</div>
-                  </td>
-                  <td className="py-3 px-4 font-mono text-[11px] text-[#475569]">
-                    {mag.issn ? (
-                      <Badge variant="outline" className="rounded-none border-[#CBD5E1] text-[10px]">
-                        {mag.issn}
-                      </Badge>
-                    ) : (
-                      '—'
-                    )}
                   </td>
                   <td className="py-3 px-4 font-mono text-[11px] text-[#64748B]">
                     <span>{mag.issuesCount ?? 0} ediciones</span> ·{' '}
@@ -414,39 +390,6 @@ export function MagazineManagementSection() {
                     className="text-xs rounded-none"
                   />
                 </div>
-              </div>
-
-              {/* ISSN */}
-              <div>
-                <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
-                  Código ISSN
-                </label>
-                <Input
-                  data-testid="magazine-form-issn"
-                  type="text"
-                  placeholder="ej. 0027-9358"
-                  value={formData.issn || ''}
-                  onChange={(e) => setFormData({ ...formData, issn: e.target.value })}
-                  className="text-xs font-mono rounded-none"
-                />
-                {formErrors.issn && (
-                  <p className="text-[11px] text-rose-600 mt-1 font-sans">{formErrors.issn}</p>
-                )}
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
-                  Descripción Histórica / Perfil Editorial
-                </label>
-                <textarea
-                  data-testid="magazine-form-description"
-                  rows={3}
-                  placeholder="Reseña histórica, temática y enfoque de la publicación..."
-                  value={formData.description || ''}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full text-xs p-2 border border-[#CBD5E1] rounded-none focus:outline-hidden focus:border-[#1B275E] text-[#1B275E]"
-                />
               </div>
 
               {/* Form Buttons */}

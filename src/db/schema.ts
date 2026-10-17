@@ -15,8 +15,6 @@ export const magazines = pgTable('magazines', {
   name: text('name').notNull().unique(),
   publisher: text('publisher'),
   country: text('country'),
-  issn: text('issn'),
-  description: text('description'),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -28,7 +26,7 @@ export const magazineIssues = pgTable('magazine_issues', {
     .notNull(),
   issueNumber: text('issue_number').notNull(),
   year: integer('year').notNull(),
-  month: text('month'),
+  month: integer('month'),
   title: text('title'),
   coverImageUrl: text('cover_image_url'),
   createdAt: timestamp('created_at').defaultNow(),

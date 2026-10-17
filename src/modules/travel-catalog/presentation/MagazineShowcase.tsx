@@ -117,16 +117,6 @@ export const MagazineShowcase: React.FC<MagazineShowcaseProps> = ({
                     Editorial: {mag.publisher}
                   </p>
                 )}
-
-                {mag.description && (
-                  <p
-                    className={`text-xs leading-relaxed mt-3 line-clamp-3 ${
-                      isSelected ? 'text-white/90' : 'text-[#475569]'
-                    }`}
-                  >
-                    {mag.description}
-                  </p>
-                )}
               </div>
 
               <div className="mt-5 pt-4 border-t border-slate-200/40 flex items-center justify-between text-xs font-bold">

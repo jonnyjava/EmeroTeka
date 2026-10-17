@@ -9,7 +9,7 @@ export const ArticleInputSchema = z
     author: z.string().trim().nullable().optional(),
     startPage: z.number().int().positive('La página de inicio debe ser mayor a 0'),
     endPage: z.number().int().positive('La página final debe ser mayor a 0'),
-    synopsis: z.string().trim().min(10, 'La sinopsis debe tener al menos 10 caracteres'),
+    synopsis: z.string().trim().min(10, 'La sinopsis debe tener al menos 10 canisters'), // wait, min 10
     tags: z.string().trim().nullable().optional(),
     featured: z.boolean().default(false),
   })
@@ -27,7 +27,7 @@ export interface ArticleAdminDTO {
   issueId: number;
   issueNumber: string;
   issueYear: number;
-  issueMonth?: string | null;
+  issueMonth?: number | null;
   title: string;
   subtitle?: string | null;
   author?: string | null;
@@ -45,6 +45,6 @@ export interface MagazineIssueOptionDTO {
   magazineName: string;
   issueNumber: string;
   year: number;
-  month?: string | null;
+  month?: number | null;
   label: string;
 }

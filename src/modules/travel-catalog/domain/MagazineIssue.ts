@@ -4,13 +4,29 @@
  * Represents an issue or edition of a travel publication.
  * Encapsulates the journal name, number, year, and metadata.
  */
+const MONTH_NAMES = [
+  '',
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+];
+
 export interface MagazineIssueProps {
   id: number;
   magazineId: number;
   magazineName: string;
   issueNumber: string;
   year: number;
-  month?: string | null;
+  month?: number | null;
   title?: string | null;
   coverImageUrl?: string | null;
 }
@@ -21,7 +37,7 @@ export class MagazineIssue {
   private readonly _magazineName: string;
   private readonly _issueNumber: string;
   private readonly _year: number;
-  private readonly _month?: string;
+  private readonly _month?: number;
   private readonly _title?: string;
   private readonly _coverImageUrl?: string;
 
@@ -31,7 +47,7 @@ export class MagazineIssue {
     this._magazineName = props.magazineName.trim();
     this._issueNumber = props.issueNumber.trim();
     this._year = props.year;
-    this._month = props.month?.trim() || undefined;
+    this._month = props.month && props.month >= 1 && props.month <= 12 ? props.month : undefined;
     this._title = props.title?.trim() || undefined;
     this._coverImageUrl = props.coverImageUrl?.trim() || undefined;
   }
@@ -71,8 +87,12 @@ export class MagazineIssue {
     return this._year;
   }
 
-  public get month(): string | undefined {
+  public get month(): number | undefined {
     return this._month;
+  }
+
+  public get monthName(): string | undefined {
+    return this._month ? MONTH_NAMES[this._month] : undefined;
   }
 
   public get title(): string | undefined {
@@ -87,7 +107,8 @@ export class MagazineIssue {
    * Generates a bibliographic reference for citation (e.g. "National Geographic · Nº 4 (Octubre 1994)").
    */
   public getFullCitation(): string {
-    const timeStr = this._month ? `${this._month} ${this._year}` : `${this._year}`;
+    const monthStr = this.monthName;
+    const timeStr = monthStr ? `${monthStr} ${this._year}` : `${this._year}`;
     return `${this._magazineName} · Nº ${this._issueNumber} (${timeStr})`;
   }
 
@@ -99,6 +120,7 @@ export class MagazineIssue {
       issueNumber: this._issueNumber,
       year: this._year,
       month: this._month,
+      monthName: this.monthName,
       title: this._title,
       coverImageUrl: this._coverImageUrl,
       fullCitation: this.getFullCitation(),

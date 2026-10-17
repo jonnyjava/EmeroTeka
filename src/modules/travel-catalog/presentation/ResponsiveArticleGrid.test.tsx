@@ -34,7 +34,7 @@ describe('ResponsiveArticleGrid Component', () => {
       name: 'Lonely Planet Magazine',
       issueNumber: '88',
       year: 2021,
-      month: 'Mayo',
+      month: 5,
       fullCitation: 'Lonely Planet Magazine · Nº 88 (Mayo 2021)',
       coverImageUrl: 'https://images.unsplash.com/sahara.jpg',
     },

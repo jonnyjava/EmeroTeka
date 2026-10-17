@@ -157,7 +157,6 @@ export class PostgresArticleRepository implements IArticleRepository {
           name: mag.name,
           publisher: mag.publisher ?? undefined,
           country: mag.country ?? undefined,
-          description: mag.description ?? undefined,
           issuesCount: Number(issuesCountRes[0]?.count ?? 0),
           articlesCount: Number(articlesCountRes[0]?.count ?? 0),
         });

@@ -50,7 +50,7 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
       name: 'National Geographic',
       issueNumber: '315',
       year: 2021,
-      month: 'Noviembre',
+      month: 11,
       fullCitation: 'National Geographic · Nº 315 (Noviembre 2021)',
     },
     synopsis: 'Exploración en el archipiélago ártico bajo el sol de medianoche.',

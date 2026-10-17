@@ -19,7 +19,7 @@ describe('ArticleDetailModal Component', () => {
       name: 'Altaïr Magazine',
       issueNumber: '112',
       year: 2020,
-      month: 'Abril',
+      month: 4,
       fullCitation: 'Altaïr Magazine · Nº 112 (Abril 2020)',
     },
     synopsis: 'Exploración arqueológica y etnográfica en el cañón de Petra.',

@@ -18,7 +18,6 @@ export interface MagazineSummary {
   name: string;
   publisher?: string;
   country?: string;
-  description?: string;
   issuesCount: number;
   articlesCount: number;
 }

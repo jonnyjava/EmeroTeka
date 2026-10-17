@@ -23,7 +23,7 @@ describe('ArticleMapper Infrastructure Mapper', () => {
         magazineId: 10,
         issueNumber: '405',
         year: 2022,
-        month: 'Marzo',
+        month: 3,
         title: 'Mares de Hielo',
         coverImageUrl: 'https://images.unsplash.com/issue-cover.jpg',
       },
@@ -32,7 +32,6 @@ describe('ArticleMapper Infrastructure Mapper', () => {
         name: 'National Geographic',
         publisher: 'National Geographic Society',
         country: 'Estados Unidos',
-        description: 'Revista de exploración y ciencia.',
       },
     };
 
@@ -79,7 +78,6 @@ describe('ArticleMapper Infrastructure Mapper', () => {
         name: 'Altaïr Magazine',
         publisher: null,
         country: null,
-        description: null,
       },
     };
 

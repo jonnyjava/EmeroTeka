@@ -12,7 +12,7 @@ class MockAdminRepository implements Partial<IAdminManagementRepository> {
         magazineName: 'National Geographic',
         issueNumber: '542',
         year: 2026,
-        month: 'Octubre',
+        month: 10,
         title: 'Especial Ártico',
         articlesCount: 5,
       },
@@ -51,7 +51,7 @@ describe('ManageMagazineIssuesUseCase', () => {
       magazineId: 1,
       issueNumber: '543',
       year: 2026,
-      month: 'Noviembre',
+      month: 11,
       title: 'Desiertos del Mundo',
     });
     expect(created.id).toBe(2);

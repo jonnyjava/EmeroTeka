@@ -32,6 +32,37 @@ import {
   getAdminMagazinesAction,
 } from '@/app/actions/admin';
 
+const MONTH_OPTIONS = [
+  { value: 1, label: 'Enero (1)' },
+  { value: 2, label: 'Febrero (2)' },
+  { value: 3, label: 'Marzo (3)' },
+  { value: 4, label: 'Abril (4)' },
+  { value: 5, label: 'Mayo (5)' },
+  { value: 6, label: 'Junio (6)' },
+  { value: 7, label: 'Julio (7)' },
+  { value: 8, label: 'Agosto (8)' },
+  { value: 9, label: 'Septiembre (9)' },
+  { value: 10, label: 'Octubre (10)' },
+  { value: 11, label: 'Noviembre (11)' },
+  { value: 12, label: 'Diciembre (12)' },
+];
+
+const MONTH_NAMES = [
+  '',
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
+];
+
 export function MagazineIssueManagementSection() {
   const [issues, setIssues] = useState<MagazineIssueAdminDTO[]>([]);
   const [magazines, setMagazines] = useState<MagazineAdminDTO[]>([]);
@@ -51,7 +82,7 @@ export function MagazineIssueManagementSection() {
     magazineId: 0,
     issueNumber: '',
     year: new Date().getFullYear(),
-    month: '',
+    month: null,
     title: '',
     coverImageUrl: '',
   });
@@ -113,7 +144,7 @@ export function MagazineIssueManagementSection() {
       magazineId: magazines[0]?.id || 0,
       issueNumber: '',
       year: new Date().getFullYear(),
-      month: '',
+      month: null,
       title: '',
       coverImageUrl: '',
     });
@@ -128,7 +159,7 @@ export function MagazineIssueManagementSection() {
       magazineId: issue.magazineId,
       issueNumber: issue.issueNumber,
       year: issue.year,
-      month: issue.month || '',
+      month: issue.month ?? null,
       title: issue.title || '',
       coverImageUrl: issue.coverImageUrl || '',
     });
@@ -332,89 +363,92 @@ export function MagazineIssueManagementSection() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E2E8F0]">
-              {issueList.map((issue) => (
-                <tr
-                  key={issue.id}
-                  data-testid={`magazine-issue-row-${issue.id}`}
-                  className="hover:bg-[#F8FAFC] transition-colors"
-                >
-                  <td className="py-3 px-4 font-serif font-bold text-[#1B275E]">
-                    <div className="flex items-center gap-3">
-                      {issue.coverImageUrl ? (
-                        <div className="w-8 h-10 bg-[#E2E8F0] relative overflow-hidden shrink-0 border border-[#CBD5E1]">
-                          <Image
-                            src={issue.coverImageUrl}
-                            alt={`Nº ${issue.issueNumber}`}
-                            fill
-                            referrerPolicy="no-referrer"
-                            className="object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-8 h-10 bg-[#152042] text-[#D2A446] flex items-center justify-center shrink-0">
-                          <ImageIcon className="w-4 h-4" />
-                        </div>
-                      )}
-                      <div>
-                        <div className="text-sm flex items-center gap-2">
-                          <span>Nº {issue.issueNumber}</span>
-                          {issue.title && (
-                            <span className="font-sans font-normal text-xs text-[#334155]">
-                              — {issue.title}
+              {issueList.map((issue) => {
+                const monthName = issue.month && issue.month >= 1 && issue.month <= 12 ? MONTH_NAMES[issue.month] : null;
+                return (
+                  <tr
+                    key={issue.id}
+                    data-testid={`magazine-issue-row-${issue.id}`}
+                    className="hover:bg-[#F8FAFC] transition-colors"
+                  >
+                    <td className="py-3 px-4 font-serif font-bold text-[#1B275E]">
+                      <div className="flex items-center gap-3">
+                        {issue.coverImageUrl ? (
+                          <div className="w-8 h-10 bg-[#E2E8F0] relative overflow-hidden shrink-0 border border-[#CBD5E1]">
+                            <Image
+                              src={issue.coverImageUrl}
+                              alt={`Nº ${issue.issueNumber}`}
+                              fill
+                              referrerPolicy="no-referrer"
+                              className="object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-8 h-10 bg-[#152042] text-[#D2A446] flex items-center justify-center shrink-0">
+                            <ImageIcon className="w-4 h-4" />
+                          </div>
+                        )}
+                        <div>
+                          <div className="text-sm flex items-center gap-2">
+                            <span>Nº {issue.issueNumber}</span>
+                            {issue.title && (
+                              <span className="font-sans font-normal text-xs text-[#334155]">
+                                — {issue.title}
+                              </span>
+                            )}
+                          </div>
+                          {issue.coverImageUrl && (
+                            <span className="font-mono font-normal text-[10px] text-[#64748B] block mt-0.5 truncate max-w-xs">
+                              {issue.coverImageUrl}
                             </span>
                           )}
                         </div>
-                        {issue.coverImageUrl && (
-                          <span className="font-mono font-normal text-[10px] text-[#64748B] block mt-0.5 truncate max-w-xs">
-                            {issue.coverImageUrl}
-                          </span>
-                        )}
                       </div>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 font-sans text-[#1B275E] font-medium">
-                    {issue.magazineName}
-                  </td>
-                  <td className="py-3 px-4 font-mono text-[11px] text-[#475569]">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-[#D2A446]" />
-                      <span>
-                        {issue.year}
-                        {issue.month ? ` (${issue.month})` : ''}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 font-mono text-[11px] text-[#64748B]">
-                    <Badge variant="outline" className="rounded-none border-[#CBD5E1] text-[10px]">
-                      {issue.articlesCount ?? 0} artículos
-                    </Badge>
-                  </td>
-                  <td className="py-3 px-4 text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button
-                        data-testid={`magazine-issue-edit-btn-${issue.id}`}
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleOpenEdit(issue)}
-                        className="h-8 w-8 p-0 text-[#1B275E] hover:bg-[#E2E8F0] cursor-pointer rounded-none"
-                        title="Editar edición"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </Button>
-                      <Button
-                        data-testid={`magazine-issue-delete-btn-${issue.id}`}
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setDeletingIssue(issue)}
-                        className="h-8 w-8 p-0 text-rose-600 hover:bg-rose-50 cursor-pointer rounded-none"
-                        title="Eliminar edición"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="py-3 px-4 font-sans text-[#1B275E] font-medium">
+                      {issue.magazineName}
+                    </td>
+                    <td className="py-3 px-4 font-mono text-[11px] text-[#475569]">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-[#D2A446]" />
+                        <span>
+                          {issue.year}
+                          {monthName ? ` (${monthName})` : ''}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 font-mono text-[11px] text-[#64748B]">
+                      <Badge variant="outline" className="rounded-none border-[#CBD5E1] text-[10px]">
+                        {issue.articlesCount ?? 0} artículos
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          data-testid={`magazine-issue-edit-btn-${issue.id}`}
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleOpenEdit(issue)}
+                          className="h-8 w-8 p-0 text-[#1B275E] hover:bg-[#E2E8F0] cursor-pointer rounded-none"
+                          title="Editar edición"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          data-testid={`magazine-issue-delete-btn-${issue.id}`}
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setDeletingIssue(issue)}
+                          className="h-8 w-8 p-0 text-rose-600 hover:bg-rose-50 cursor-pointer rounded-none"
+                          title="Eliminar edición"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -513,16 +547,29 @@ export function MagazineIssueManagementSection() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
-                    Mes / Periodo
+                    Mes
                   </label>
-                  <Input
+                  <select
                     data-testid="magazine-issue-form-month"
-                    type="text"
-                    placeholder="ej. Octubre, Invierno, Q3..."
-                    value={formData.month || ''}
-                    onChange={(e) => setFormData({ ...formData, month: e.target.value })}
-                    className="text-xs rounded-none"
-                  />
+                    value={formData.month ?? ''}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        month: e.target.value === '' ? null : Number(e.target.value),
+                      })
+                    }
+                    className="w-full text-xs h-9 px-3 bg-white border border-[#CBD5E1] rounded-none text-[#1B275E] focus:outline-hidden focus:border-[#1B275E]"
+                  >
+                    <option value="">Selecciona un mes (opcional)...</option>
+                    {MONTH_OPTIONS.map((m) => (
+                      <option key={m.value} value={m.value}>
+                        {m.label}
+                      </option>
+                    ))}
+                  </select>
+                  {formErrors.month && (
+                    <p className="text-[11px] text-rose-600 mt-1 font-sans">{formErrors.month}</p>
+                  )}
                 </div>
 
                 <div>

@@ -21,7 +21,7 @@ export interface RawDatabaseArticleJoined {
     magazineId: number;
     issueNumber: string;
     year: number;
-    month: string | null;
+    month: number | null;
     title: string | null;
     coverImageUrl: string | null;
   };
@@ -30,7 +30,6 @@ export interface RawDatabaseArticleJoined {
     name: string;
     publisher: string | null;
     country: string | null;
-    description: string | null;
   };
 }
 

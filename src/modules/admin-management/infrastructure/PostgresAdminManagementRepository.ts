@@ -27,8 +27,7 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
         or(
           ilike(magazines.name, pattern),
           ilike(magazines.publisher, pattern),
-          ilike(magazines.country, pattern),
-          ilike(magazines.issn, pattern)
+          ilike(magazines.country, pattern)
         )
       );
     }
@@ -41,8 +40,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
         name: magazines.name,
         publisher: magazines.publisher,
         country: magazines.country,
-        issn: magazines.issn,
-        description: magazines.description,
         createdAt: magazines.createdAt,
       })
       .from(magazines)
@@ -74,8 +71,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       name: r.name,
       publisher: r.publisher,
       country: r.country,
-      issn: r.issn,
-      description: r.description,
       createdAt: r.createdAt ? r.createdAt.toISOString() : null,
       issuesCount: issueMap.get(r.id) || 0,
       articlesCount: articleMap.get(r.id) || 0,
@@ -97,8 +92,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       name: r.name,
       publisher: r.publisher,
       country: r.country,
-      issn: r.issn,
-      description: r.description,
       createdAt: r.createdAt ? r.createdAt.toISOString() : null,
     };
   }
@@ -110,8 +103,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
         name: input.name.trim(),
         publisher: input.publisher?.trim() || null,
         country: input.country?.trim() || null,
-        issn: input.issn?.trim() || null,
-        description: input.description?.trim() || null,
       })
       .returning();
 
@@ -120,8 +111,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       name: inserted.name,
       publisher: inserted.publisher,
       country: inserted.country,
-      issn: inserted.issn,
-      description: inserted.description,
       createdAt: inserted.createdAt ? inserted.createdAt.toISOString() : null,
       issuesCount: 0,
       articlesCount: 0,
@@ -135,8 +124,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
         name: input.name.trim(),
         publisher: input.publisher?.trim() || null,
         country: input.country?.trim() || null,
-        issn: input.issn?.trim() || null,
-        description: input.description?.trim() || null,
       })
       .where(eq(magazines.id, id))
       .returning();
@@ -150,8 +137,6 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       name: updated.name,
       publisher: updated.publisher,
       country: updated.country,
-      issn: updated.issn,
-      description: updated.description,
       createdAt: updated.createdAt ? updated.createdAt.toISOString() : null,
     };
   }
@@ -214,7 +199,7 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       magazineName: magazine.name,
       issueNumber: issue.issueNumber,
       year: issue.year,
-      month: issue.month,
+      month: issue.month !== null && issue.month !== undefined ? Number(issue.month) : null,
       title: issue.title,
       coverImageUrl: issue.coverImageUrl,
       createdAt: issue.createdAt ? issue.createdAt.toISOString() : null,
@@ -247,7 +232,7 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       magazineName: magazine.name,
       issueNumber: issue.issueNumber,
       year: issue.year,
-      month: issue.month,
+      month: issue.month !== null && issue.month !== undefined ? Number(issue.month) : null,
       title: issue.title,
       coverImageUrl: issue.coverImageUrl,
       createdAt: issue.createdAt ? issue.createdAt.toISOString() : null,
@@ -262,7 +247,7 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
         magazineId: input.magazineId,
         issueNumber: input.issueNumber.trim(),
         year: input.year,
-        month: input.month?.trim() || null,
+        month: input.month ?? null,
         title: input.title?.trim() || null,
         coverImageUrl: input.coverImageUrl?.trim() || null,
       })
@@ -282,7 +267,7 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
         magazineId: input.magazineId,
         issueNumber: input.issueNumber.trim(),
         year: input.year,
-        month: input.month?.trim() || null,
+        month: input.month ?? null,
         title: input.title?.trim() || null,
         coverImageUrl: input.coverImageUrl?.trim() || null,
       })

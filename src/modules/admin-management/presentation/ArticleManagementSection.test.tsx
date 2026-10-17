@@ -28,7 +28,7 @@ describe('ArticleManagementSection Component', () => {
       magazineName: 'National Geographic',
       issueNumber: '142',
       year: 2024,
-      month: 'Mayo',
+      month: 5,
       label: 'National Geographic — Nº 142 (2024 - Mayo)',
     },
     {
@@ -37,7 +37,7 @@ describe('ArticleManagementSection Component', () => {
       magazineName: 'Condé Nast Traveler',
       issueNumber: '88',
       year: 2023,
-      month: 'Octubre',
+      month: 10,
       label: 'Condé Nast Traveler — Nº 88 (2023 - Octubre)',
     },
   ];
@@ -50,7 +50,7 @@ describe('ArticleManagementSection Component', () => {
       issueId: 10,
       issueNumber: '142',
       issueYear: 2024,
-      issueMonth: 'Mayo',
+      issueMonth: 5,
       title: 'El Valle de los Reyes Oculto',
       subtitle: 'Nuevos túneles dinásticos',
       author: 'Howard Vance',

@@ -34,7 +34,7 @@ describe('ArticleCard Component', () => {
       name: 'National Geographic',
       issueNumber: '290',
       year: 2019,
-      month: 'Octubre',
+      month: 10,
       fullCitation: 'National Geographic · Nº 290 (Octubre 2019)',
       coverImageUrl: 'https://images.unsplash.com/nile.jpg',
     },

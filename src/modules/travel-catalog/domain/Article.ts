@@ -34,7 +34,7 @@ export interface ArticleDTO {
     name: string;
     issueNumber: string;
     year: number;
-    month?: string;
+    month?: number;
     fullCitation: string;
     coverImageUrl?: string;
   };

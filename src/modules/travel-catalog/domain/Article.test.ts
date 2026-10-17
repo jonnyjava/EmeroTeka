@@ -9,7 +9,7 @@ describe('Article Aggregate Root', () => {
     magazineName: 'National Geographic',
     issueNumber: '315',
     year: 2021,
-    month: 'Noviembre',
+    month: 11,
     coverImageUrl: 'https://images.unsplash.com/photo-sample.jpg',
   });
 

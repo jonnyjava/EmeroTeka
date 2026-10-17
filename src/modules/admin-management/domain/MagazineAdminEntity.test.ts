@@ -7,8 +7,6 @@ describe('MagazineAdminEntity Domain Model', () => {
       name: 'Viajes El Mundo',
       publisher: 'Unidad Editorial',
       country: 'España',
-      issn: '1234-5678',
-      description: 'Revista dedicada a reportajes de expedición.',
     };
 
     const result = MagazineInputSchema.safeParse(valid);
@@ -31,19 +29,5 @@ describe('MagazineAdminEntity Domain Model', () => {
 
     const result = MagazineInputSchema.safeParse(invalid);
     expect(result.success).toBe(false);
-  });
-
-  it('validates ISSN format correctly and rejects malformed values', () => {
-    const validISSN = MagazineInputSchema.safeParse({
-      name: 'Valid ISSN Mag',
-      issn: '0027-9358',
-    });
-    expect(validISSN.success).toBe(true);
-
-    const invalidISSN = MagazineInputSchema.safeParse({
-      name: 'Invalid ISSN Mag',
-      issn: '12345678',
-    });
-    expect(invalidISSN.success).toBe(false);
   });
 });
