@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { X, Copy, Check, BookOpen, User, FileText, Bookmark } from 'lucide-react';
+import React from 'react';
+import { X, BookOpen, User, FileText } from 'lucide-react';
 import { ArticleDTO } from '../domain/Article.ts';
 
 interface ArticleDetailModalProps {
@@ -14,18 +13,7 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
   article,
   onClose,
 }) => {
-  const [copied, setCopied] = useState(false);
-
   if (!article) return null;
-
-  // Generate standard bibliographic reference
-  const bibliographicCitation = `${article.author || 'Redacción'}. (${article.magazine.year}). "${article.title}". ${article.magazine.name}, ${article.magazine.issueNumber}, ${article.pageCitation}.`;
-
-  const handleCopyCitation = () => {
-    navigator.clipboard.writeText(bibliographicCitation);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2200);
-  };
 
   return (
     <div
@@ -93,43 +81,6 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
             )}
           </div>
 
-          {/* Quick Magazine & Pagination Highlight Strip */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4.5 bg-[#F8FAFC] border-2 border-[#DCE2EE] rounded-xl">
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-[#2A3E92] text-white rounded-lg shrink-0 mt-0.5 shadow-2xs">
-                <BookOpen className="w-4 h-4 text-[#FFC72C]" />
-              </div>
-              <div>
-                <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] block font-bold">
-                  Publicación & Ejemplar
-                </span>
-                <span className="text-base font-bold text-[#1B275E] block font-serif">
-                  {article.magazine.name}
-                </span>
-                <span className="text-xs text-slate-500">
-                  {article.magazine.fullCitation}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-[#EEF2FF] text-[#2A3E92] border border-[#CCD5EE] rounded-lg shrink-0 mt-0.5 shadow-2xs">
-                <FileText className="w-4 h-4 text-[#2A3E92]" />
-              </div>
-              <div>
-                <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] block font-bold">
-                  Localización en la Revista
-                </span>
-                <span className="text-sm font-bold text-[#1B275E] block font-mono tabular-nums">
-                  Páginas {article.startPage} a {article.endPage} ({article.pageCount} páginas)
-                </span>
-                <span className="text-xs text-slate-500">
-                  {article.pageCitation}
-                </span>
-              </div>
-            </div>
-          </div>
-
           {/* Full Synopsis */}
           <div>
             <h3 className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] font-bold mb-2">
@@ -174,51 +125,42 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
             </div>
           )}
 
-          {/* Bibliographic Citation Box */}
-          <div className="p-4 bg-[#F8FAFC] border-2 border-[#DCE2EE] rounded-xl space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] font-bold flex items-center gap-1.5">
-                <Bookmark className="w-3.5 h-3.5" />
-                Cita Bibliográfica para Investigadores
-              </span>
-
-              <button
-                type="button"
-                onClick={handleCopyCitation}
-                className="text-xs font-bold text-[#2A3E92] hover:text-[#1E2D69] flex items-center gap-1 py-1 px-2.5 rounded border border-[#CCD5EE] hover:bg-white transition-colors cursor-pointer"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-emerald-700">¡Copiado!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>Copiar Cita</span>
-                  </>
-                )}
-              </button>
+          {/* Quick Magazine & Pagination Highlight Strip (Moved to bottom after Tags) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4.5 bg-[#F8FAFC] border-2 border-[#DCE2EE] rounded-xl">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-[#2A3E92] text-white rounded-lg shrink-0 mt-0.5 shadow-2xs">
+                <BookOpen className="w-4 h-4 text-[#FFC72C]" />
+              </div>
+              <div>
+                <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] block font-bold">
+                  Publicación & Ejemplar
+                </span>
+                <span className="text-base font-bold text-[#1B275E] block font-serif">
+                  {article.magazine.name}
+                </span>
+                <span className="text-xs text-slate-500">
+                  {article.magazine.fullCitation}
+                </span>
+              </div>
             </div>
 
-            <p className="font-mono text-xs text-slate-700 bg-white p-3 rounded-lg border border-[#DCE2EE] leading-relaxed break-all">
-              {bibliographicCitation}
-            </p>
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-[#EEF2FF] text-[#2A3E92] border border-[#CCD5EE] rounded-lg shrink-0 mt-0.5 shadow-2xs">
+                <FileText className="w-4 h-4 text-[#2A3E92]" />
+              </div>
+              <div>
+                <span className="text-xs font-mono uppercase tracking-wider text-[#2A3E92] block font-bold">
+                  Localización en la Revista
+                </span>
+                <span className="text-sm font-bold text-[#1B275E] block font-mono tabular-nums">
+                  Páginas {article.startPage} a {article.endPage} ({article.pageCount} páginas)
+                </span>
+                <span className="text-xs text-slate-500">
+                  {article.pageCitation}
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-
-        {/* Modal Footer */}
-        <div className="bg-[#F8FAFC] px-6 py-4 border-t-2 border-[#DCE2EE] flex items-center justify-between text-xs text-slate-500">
-          <span className="font-mono">
-            Indexado en {article.magazine.name}
-          </span>
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 bg-[#2A3E92] hover:bg-[#1E2D69] text-white font-bold rounded-lg transition-colors cursor-pointer"
-          >
-            Cerrar
-          </button>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { ArticleDetailModal } from './ArticleDetailModal.tsx';
 import { ArticleDTO } from '../domain/Article.ts';
 
@@ -49,42 +49,6 @@ describe('ArticleDetailModal Component', () => {
     const closeBtn = screen.getByLabelText('Cerrar ficha');
     fireEvent.click(closeBtn);
     expect(handleClose).toHaveBeenCalledTimes(1);
-
-    // Close button in footer
-    const footerCloseBtn = screen.getByRole('button', { name: 'Cerrar' });
-    fireEvent.click(footerCloseBtn);
-    expect(handleClose).toHaveBeenCalledTimes(2);
-  });
-
-  it('copies bibliographic citation to clipboard and shows feedback', async () => {
-    vi.useFakeTimers();
-
-    const writeTextMock = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: writeTextMock,
-      },
-    });
-
-    render(<ArticleDetailModal article={sampleArticle} onClose={vi.fn()} />);
-
-    const copyBtn = screen.getByRole('button', { name: /copiar cita/i });
-    fireEvent.click(copyBtn);
-
-    expect(writeTextMock).toHaveBeenCalledWith(
-      expect.stringContaining('Petra Entre Sombras y Rocas')
-    );
-    expect(screen.getByText('¡Copiado!')).toBeInTheDocument();
-
-    // Advance timer to test reverting copied state
-    act(() => {
-      vi.advanceTimersByTime(2300);
-    });
-
-    expect(screen.queryByText('¡Copiado!')).not.toBeInTheDocument();
-    expect(screen.getByText('Copiar Cita')).toBeInTheDocument();
-
-    vi.useRealTimers();
   });
 
   it('handles backdrop click to close and prevents modal content click propagation', () => {

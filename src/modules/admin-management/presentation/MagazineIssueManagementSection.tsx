@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Calendar,
   Image as ImageIcon,
+  Upload,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -77,6 +78,10 @@ export function MagazineIssueManagementSection() {
   const [editingIssue, setEditingIssue] = useState<MagazineIssueAdminDTO | null>(null);
   const [deletingIssue, setDeletingIssue] = useState<MagazineIssueAdminDTO | null>(null);
 
+  // Upload states
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
   // Form states
   const [formData, setFormData] = useState<MagazineIssueInput>({
     magazineId: 0,
@@ -137,9 +142,40 @@ export function MagazineIssueManagementSection() {
     };
   }, [search, selectedMagazineFilter, refreshKey]);
 
+  // Handle file upload via Vercel Blob API route
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    try {
+      const dataForm = new FormData();
+      dataForm.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: dataForm,
+      });
+      const json = await res.json();
+
+      if (json.success && json.url) {
+        setFormData((prev) => ({ ...prev, coverImageUrl: json.url }));
+      } else {
+        setUploadError(json.error || 'Error al subir la imagen.');
+      }
+    } catch (err: unknown) {
+      setUploadError(err instanceof Error ? err.message : 'Error al subir la imagen.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   // Handle open create modal
   const handleOpenCreate = () => {
     setEditingIssue(null);
+    setUploadError(null);
     setFormData({
       magazineId: magazines[0]?.id || 0,
       issueNumber: '',
@@ -155,6 +191,7 @@ export function MagazineIssueManagementSection() {
   // Handle open edit modal
   const handleOpenEdit = (issue: MagazineIssueAdminDTO) => {
     setEditingIssue(issue);
+    setUploadError(null);
     setFormData({
       magazineId: issue.magazineId,
       issueNumber: issue.issueNumber,
@@ -587,19 +624,56 @@ export function MagazineIssueManagementSection() {
                 </div>
               </div>
 
-              {/* Cover Image URL */}
+              {/* Cover Image Upload via Vercel Blob */}
               <div>
-                <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
-                  URL de la Portada (Cover Image URL)
+                <label className="block text-xs font-mono uppercase text-[#334155] mb-1 flex items-center gap-1.5">
+                  <Upload className="w-3.5 h-3.5 text-[#D2A446]" />
+                  Imagen de Portada (Subir con Vercel Blob)
                 </label>
-                <Input
-                  data-testid="magazine-issue-form-cover-url"
-                  type="text"
-                  placeholder="ej. /images/mag_altair_silkroad_1791410402139.jpg"
-                  value={formData.coverImageUrl || ''}
-                  onChange={(e) => setFormData({ ...formData, coverImageUrl: e.target.value })}
-                  className="text-xs font-mono rounded-none"
-                />
+                <div className="flex items-center gap-3">
+                  <Input
+                    data-testid="magazine-issue-form-cover-file"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    disabled={isUploading}
+                    className="text-xs rounded-none file:mr-4 file:py-1 file:px-4 file:rounded-none file:border-0 file:text-xs file:font-semibold file:bg-[#1B275E] file:text-white hover:file:bg-[#2A3E92] cursor-pointer"
+                  />
+                  {isUploading && (
+                    <div className="flex items-center gap-1.5 text-xs text-[#64748B] font-mono shrink-0">
+                      <Loader2 className="w-4 h-4 animate-spin text-[#D2A446]" />
+                      <span>Subiendo...</span>
+                    </div>
+                  )}
+                </div>
+                {uploadError && (
+                  <p className="text-[11px] text-rose-600 mt-1 font-sans">{uploadError}</p>
+                )}
+                {formData.coverImageUrl && (
+                  <div className="mt-2 flex items-center gap-3 p-2 bg-slate-50 border border-[#CBD5E1]">
+                    <div className="w-10 h-12 relative bg-slate-200 shrink-0 border">
+                      <Image
+                        src={formData.coverImageUrl}
+                        alt="Preview"
+                        fill
+                        referrerPolicy="no-referrer"
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 truncate">
+                      <span className="text-[10px] font-mono text-slate-600 block truncate">
+                        {formData.coverImageUrl}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, coverImageUrl: '' })}
+                        className="text-[10px] text-rose-600 hover:underline mt-0.5 cursor-pointer"
+                      >
+                        Eliminar imagen
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Form Buttons */}
@@ -617,7 +691,7 @@ export function MagazineIssueManagementSection() {
                 <Button
                   data-testid="magazine-issue-submit-btn"
                   type="submit"
-                  disabled={isPending}
+                  disabled={isPending || isUploading}
                   className="bg-[#1B275E] hover:bg-[#2A3E92] text-white text-xs font-mono uppercase rounded-none h-9 px-4 flex items-center gap-2 cursor-pointer"
                 >
                   {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
