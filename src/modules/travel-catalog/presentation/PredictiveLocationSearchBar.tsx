@@ -121,35 +121,35 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
         <div className="flex-1 bg-[#2A3E92]" />
       </div>
 
-      {/* Header with Title and Reset Control */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 pb-5 border-b-2 border-[#DCE2EE] pt-2">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="inline-flex items-center gap-1.5 text-xs font-mono tracking-wider uppercase text-[#2A3E92] font-bold bg-[#EEF2FF] px-2.5 py-1 rounded-md border border-[#CCD5EE]">
-              <Compass className="w-3.5 h-3.5 text-[#2A3E92]" />
-              Guía de Búsqueda · Lonely Planet Index
-            </span>
-          </div>
-
-          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#1B275E] tracking-tight">
-            Localizador Predictivo por Destino y Geografía
-          </h2>
-
-          <p className="text-sm text-[#475569] mt-1.5 max-w-2xl leading-relaxed">
-            Escribe el nombre de cualquier ciudad, país o reportaje para descubrir la revista, volumen, año y páginas exactas de publicación.
-          </p>
+      {/* Header with Title and Reset Control spanning full line */}
+      <div className="mb-6 pb-5 border-b-2 border-[#DCE2EE] pt-2">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="inline-flex items-center gap-1.5 text-xs font-mono tracking-wider uppercase text-[#2A3E92] font-bold bg-[#EEF2FF] px-2.5 py-1 rounded-md border border-[#CCD5EE]">
+            <Compass className="w-3.5 h-3.5 text-[#2A3E92]" />
+            Guía de Búsqueda · Lonely Planet Index
+          </span>
         </div>
 
+        <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#1B275E] tracking-tight">
+          Localizador por argumentos
+        </h2>
+
+        <p className="text-sm text-[#475569] mt-1.5 max-w-full leading-relaxed">
+          Escribe el nombre de cualquier ciudad, país o reportaje para descubrir la revista, volumen, año y páginas exactas de publicación.
+        </p>
+
         {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onReset}
-            className="text-[#2A3E92] hover:text-[#1E2D69] hover:bg-[#EEF2FF] border border-[#CCD5EE] self-start md:self-auto font-bold text-xs gap-1.5 cursor-pointer"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Restablecer búsqueda</span>
-          </Button>
+          <div className="mt-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onReset}
+              className="text-[#2A3E92] hover:text-[#1E2D69] hover:bg-[#EEF2FF] border border-[#CCD5EE] font-bold text-xs gap-1.5 cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Restablecer búsqueda</span>
+            </Button>
+          </div>
         )}
       </div>
 
@@ -173,7 +173,7 @@ export const PredictiveLocationSearchBar: React.FC<PredictiveLocationSearchBarPr
               }}
               onFocus={() => setIsFocused(true)}
               onKeyDown={handleKeyDown}
-              placeholder="Buscar destino, ciudad o país (ej. Petra, Kioto, Svalbard, Positano, Altiplano)..."
+              placeholder="Que argumentos quieres buscar?"
               className="w-full pl-13 pr-32 py-4 bg-[#F8FAFC] hover:bg-white focus:bg-white border-2 border-[#CCD5EE] focus:border-[#2A3E92] rounded-xl text-base text-[#1B275E] placeholder:text-slate-400 font-medium transition-all shadow-xs focus:outline-hidden focus:ring-4 focus:ring-[#2A3E92]/15"
             />
 

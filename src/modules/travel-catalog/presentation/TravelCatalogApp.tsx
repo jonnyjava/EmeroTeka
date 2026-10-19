@@ -86,21 +86,13 @@ export const TravelCatalogApp: React.FC<TravelCatalogAppProps> = ({
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#2A3E92_1px,transparent_1px)] [background-size:16px_16px]" />
 
         <div className="max-w-5xl mx-auto text-center space-y-4 relative z-10">
-          {/* Top Spine Ribbon / Metadata Pill */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[#EEF2FF] border border-[#CCD5EE] rounded-md text-xs font-mono text-[#2A3E92] font-bold tracking-wider uppercase shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-[#FFC72C] inline-block ring-2 ring-[#2A3E92]" />
-            <span>Tipografía National Geographic (Geograph & Caslon) · Paleta St Tropaz</span>
-            <span className="hidden sm:inline text-slate-400">·</span>
-            <span className="hidden sm:inline text-[#1B275E] font-normal">Hemeroteca Histórica</span>
-          </div>
-
           {/* Main Title in Authoritative Editorial Serif with St Tropaz Blue tone */}
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-[#1B275E] leading-[1.12] text-balance">
-            Catálogo Histórico de Artículos de Viajes
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-[#1B275E] leading-[1.12]">
+            Catálogo Histórico Revistas y Artículos
           </h1>
 
-          <p className="text-base sm:text-lg text-[#475569] max-w-2xl mx-auto leading-relaxed">
-            Descubre con precisión milimétrica en qué revista, año, número y páginas se publicaron crónicas, mapas y reportajes de autor sobre cualquier destino o rincón del planeta.
+          <p className="text-base sm:text-lg text-[#475569] leading-relaxed">
+            Busca todos los articulos de los argumentos que te interesan en tu revistas favoritas
           </p>
 
           {/* Guidebook Stats Strip (Pre-2022 LP Chapter Index Style) */}

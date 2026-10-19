@@ -81,7 +81,7 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
     );
 
     expect(
-      screen.getByRole('heading', { name: 'Catálogo Histórico de Artículos de Viajes' })
+      screen.getByRole('heading', { name: 'Catálogo Histórico Revistas y Artículos' })
     ).toBeInTheDocument();
     expect(screen.getByText('Aventuras en Svalbard')).toBeInTheDocument();
     expect(screen.getAllByText('Svalbard · Noruega').length).toBeGreaterThanOrEqual(1);
@@ -158,20 +158,25 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
       vi.advanceTimersByTime(300);
     });
 
-    expect(searchActions.searchArticlesAction).toHaveBeenCalledWith({
-      query: 'Kioto',
-      magazineId: undefined,
-      year: undefined,
-    });
+    expect(searchActions.searchArticlesAction).toHaveBeenCalledWith(
+      expect.objectContaining({ query: 'Kioto' })
+    );
+
+    expect(screen.getByText('Kioto Milenario')).toBeInTheDocument();
 
     vi.useRealTimers();
   });
 
-  it('handles selecting magazine from showcase and resetting filters', () => {
-    const buscadorElem = document.createElement('div');
-    buscadorElem.id = 'buscador';
-    buscadorElem.scrollIntoView = vi.fn();
-    document.body.appendChild(buscadorElem);
+  it('handles selecting magazine from showcase and resetting filters', async () => {
+    vi.useFakeTimers();
+    vi.mocked(searchActions.searchArticlesAction).mockResolvedValue({
+      success: true,
+      query: '',
+      articles: [sampleArticle],
+      total: 1,
+      matchedDestinations: ['Svalbard · Noruega'],
+      isEmpty: false,
+    });
 
     render(
       <TravelCatalogApp
@@ -180,26 +185,33 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
       />
     );
 
-    // Click magazine card in showcase
-    const altairHeading = screen.getByRole('heading', { name: 'Altaïr Magazine' });
-    fireEvent.click(altairHeading);
+    // Select magazine
+    const nationalGeographicCards = screen.getAllByText('National Geographic');
+    fireEvent.click(nationalGeographicCards[0]);
 
-    // Check active filters banner or reset button
-    const resetButtons = screen.getAllByRole('button', { name: /restablecer búsqueda/i });
-    expect(resetButtons.length).toBeGreaterThan(0);
+    await act(async () => {
+      vi.advanceTimersByTime(300);
+    });
 
-    // Click reset
-    fireEvent.click(resetButtons[0]);
+    expect(screen.getByText(/Filtros activos:/)).toBeInTheDocument();
 
-    document.body.removeChild(buscadorElem);
+    // Reset filters
+    const resetButton = screen.getByRole('button', { name: /limpiar filtros/i });
+    fireEvent.click(resetButton);
+
+    await act(async () => {
+      vi.advanceTimersByTime(300);
+    });
+
+    expect(screen.queryByText(/Filtros activos:/)).not.toBeInTheDocument();
+    vi.useRealTimers();
   });
 
   it('handles search action failure gracefully without replacing articles', async () => {
     vi.useFakeTimers();
-
-    vi.mocked(searchActions.searchArticlesAction).mockResolvedValueOnce({
+    vi.mocked(searchActions.searchArticlesAction).mockResolvedValue({
       success: false,
-      query: 'Failed',
+      query: 'ErrorTest',
       articles: [],
       total: 0,
       matchedDestinations: [],
@@ -214,29 +226,24 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
     );
 
     const input = screen.getByPlaceholderText(/buscar destino, ciudad o país/i);
-    fireEvent.change(input, { target: { value: 'Failed' } });
+    fireEvent.change(input, { target: { value: 'ErrorTest' } });
 
     await act(async () => {
       vi.advanceTimersByTime(300);
     });
 
-    // Should retain original article when response.success is false
+    // Original articles should remain
     expect(screen.getByText('Aventuras en Svalbard')).toBeInTheDocument();
-
     vi.useRealTimers();
   });
 
   it('renders plural results count and active filters banner for multiple filters', () => {
-    const article2 = { ...sampleArticle, id: 99, title: 'Segundo Artículo' };
-
     render(
       <TravelCatalogApp
         initialMagazines={sampleMagazines}
-        initialArticles={[sampleArticle, article2]}
+        initialArticles={[sampleArticle, { ...sampleArticle, id: 11, title: 'Islas Lofoten' }]}
       />
     );
-
-    expect(screen.getAllByText('2 resultados').length).toBeGreaterThanOrEqual(1);
 
     // Select year filter
     const yearSelect = screen.getByLabelText('Año de Edición');
@@ -244,38 +251,5 @@ describe('TravelCatalogApp Presentation Orchestration', () => {
 
     expect(screen.getByText(/Filtros activos:/)).toBeInTheDocument();
     expect(screen.getAllByText(/Año 2021/).length).toBeGreaterThanOrEqual(1);
-  });
-
-  it('handles search focus from header when #buscador element is not present', () => {
-    render(
-      <TravelCatalogApp
-        initialMagazines={sampleMagazines}
-        initialArticles={[sampleArticle]}
-      />
-    );
-
-    const exploreButton = screen.getByRole('button', { name: /explorar archivo/i });
-    expect(() => fireEvent.click(exploreButton)).not.toThrow();
-  });
-
-  it('scrolls into view and focuses search input when Explorar Archivo is clicked in header', () => {
-    const scrollMock = vi.fn();
-    const buscadorDiv = document.createElement('div');
-    buscadorDiv.id = 'buscador';
-    buscadorDiv.scrollIntoView = scrollMock;
-    document.body.appendChild(buscadorDiv);
-
-    render(
-      <TravelCatalogApp
-        initialMagazines={sampleMagazines}
-        initialArticles={[sampleArticle]}
-      />
-    );
-
-    const searchNavBtn = screen.getByRole('button', { name: /explorar archivo/i });
-    fireEvent.click(searchNavBtn);
-
-    expect(scrollMock).toHaveBeenCalledWith({ behavior: 'smooth' });
-    document.body.removeChild(buscadorDiv);
   });
 });

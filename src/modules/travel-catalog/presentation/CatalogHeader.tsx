@@ -2,17 +2,14 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Compass, Search } from 'lucide-react';
+import { Compass } from 'lucide-react';
 
 interface CatalogHeaderProps {
   onSearchFocus: () => void;
   totalArticles: number;
 }
 
-export const CatalogHeader: React.FC<CatalogHeaderProps> = ({
-  onSearchFocus,
-  totalArticles,
-}) => {
+export const CatalogHeader: React.FC<CatalogHeaderProps> = () => {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b-2 border-[#DCE2EE] shadow-2xs">
       {/* Lonely Planet Spine Brand Stripe (St Tropaz #2A3E92 & Sunflower Gold #FFC72C) */}
@@ -36,60 +33,7 @@ export const CatalogHeader: React.FC<CatalogHeaderProps> = ({
                 Emero.tk
               </span>
             </div>
-
-            <div className="flex flex-col">
-              <span className="font-display text-base sm:text-lg font-bold text-[#1B275E] leading-tight tracking-wider uppercase">
-                Viaggi
-              </span>
-              <span className="hidden sm:inline font-mono text-[10px] tracking-widest uppercase text-[#2A3E92] font-bold">
-                Revistas & Crónicas
-              </span>
-            </div>
-
-            <span className="hidden md:inline font-mono text-[10px] tracking-wider uppercase text-[#2A3E92] font-bold bg-[#EEF2FF] px-2 py-0.5 rounded border border-[#CCD5EE]">
-              NatGeo Type
-            </span>
           </Link>
-        </div>
-
-        {/* Zone 2: Navigation Links */}
-        <nav className="hidden md:flex items-center gap-7 text-sm font-medium text-[#475569]">
-          <a
-            href="#buscador"
-            onClick={(e) => {
-              e.preventDefault();
-              onSearchFocus();
-            }}
-            className="hover:text-[#2A3E92] transition-colors font-semibold flex items-center gap-1.5"
-          >
-            <span>Explorar Destinos</span>
-          </a>
-          <a
-            href="#revistas"
-            onClick={(e) => {
-              e.preventDefault();
-              const el = document.getElementById('revistas');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="hover:text-[#2A3E92] transition-colors font-semibold"
-          >
-            Hemeroteca de Revistas
-          </a>
-        </nav>
-
-        {/* Zone 3: Primary Action (St Tropaz #2A3E92 Button with Gold Accent) */}
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={onSearchFocus}
-            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-[#2A3E92] hover:bg-[#1E2D69] active:bg-[#141E46] rounded-lg transition-all whitespace-nowrap cursor-pointer shadow-sm border border-[#1B275E]/50"
-          >
-            <Search className="w-3.5 h-3.5 text-[#FFC72C]" />
-            <span className="hidden sm:inline">Explorar Archivo</span>
-            <span className="font-mono text-[11px] bg-[#FFC72C] text-[#1B275E] px-1.5 py-0.2 rounded font-bold tabular-nums">
-              {totalArticles}
-            </span>
-          </button>
         </div>
       </div>
     </header>
