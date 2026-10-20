@@ -36,4 +36,7 @@ export interface IAdminManagementRepository {
 
   // Issue lookup helper (read-only for article issue selector)
   getMagazineIssuesOptions(): Promise<MagazineIssueOptionDTO[]>;
+
+  // Tags lookup helper
+  listTags(): Promise<string[]>;
 }

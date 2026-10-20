@@ -52,6 +52,14 @@ export const articles = pgTable('articles', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
+// Tag Entity
+export const tags = pgTable('tags', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+
 // Relational Mappings
 export const magazinesRelations = relations(magazines, ({ many }) => ({
   issues: many(magazineIssues),

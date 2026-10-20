@@ -40,4 +40,8 @@ export class ManageArticlesUseCase {
   async getIssueOptions(): Promise<MagazineIssueOptionDTO[]> {
     return await this.repository.getMagazineIssuesOptions();
   }
+
+  async getTags(): Promise<string[]> {
+    return await this.repository.listTags();
+  }
 }

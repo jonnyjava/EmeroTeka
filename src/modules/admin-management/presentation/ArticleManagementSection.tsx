@@ -27,6 +27,7 @@ import {
   getAdminArticlesAction,
   getAdminMagazinesAction,
   getAdminIssueOptionsAction,
+  getAdminTagsAction,
   createAdminArticleAction,
   updateAdminArticleAction,
   deleteAdminArticleAction,
@@ -66,6 +67,62 @@ export function ArticleManagementSection() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isPending, startTransition] = useTransition();
   const [refreshKey, setRefreshKey] = useState(0);
+
+  // Tags state for autocomplete
+  const [existingTags, setExistingTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
+  const [showTagSuggestions, setShowTagSuggestions] = useState(false);
+
+  useEffect(() => {
+    let ignore = false;
+    async function loadTags() {
+      try {
+        const res = await getAdminTagsAction();
+        if (!ignore && res.success && res.data) {
+          setExistingTags(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to load tags:', err);
+      }
+    }
+    loadTags();
+    return () => {
+      ignore = true;
+    };
+  }, [refreshKey, isModalOpen]);
+
+  const filteredTagSuggestions = useMemo(() => {
+    const currentTags = (formData.tags || '')
+      .split(',')
+      .map((t) => t.trim().toLowerCase())
+      .filter(Boolean);
+
+    const query = tagInput.trim().toLowerCase();
+    if (!query) return existingTags.filter((t) => !currentTags.includes(t.toLowerCase())).slice(0, 8);
+
+    return existingTags
+      .filter(
+        (t) =>
+          t.toLowerCase().includes(query) &&
+          !currentTags.includes(t.toLowerCase())
+      )
+      .slice(0, 8);
+  }, [existingTags, formData.tags, tagInput]);
+
+  const handleSelectTagSuggestion = (tagName: string) => {
+    const currentTags = (formData.tags || '')
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean);
+
+    if (!currentTags.map((t) => t.toLowerCase()).includes(tagName.toLowerCase())) {
+      currentTags.push(tagName);
+      setFormData({ ...formData, tags: currentTags.join(', ') });
+    }
+    setTagInput('');
+    setShowTagSuggestions(false);
+  };
+
 
   // Initial load for magazines and issue options
   useEffect(() => {
@@ -149,6 +206,7 @@ export function ArticleManagementSection() {
       tags: '',
       featured: false,
     });
+    setTagInput('');
     setFormErrors({});
     setIsModalOpen(true);
   };
@@ -168,6 +226,7 @@ export function ArticleManagementSection() {
       tags: art.tags || '',
       featured: Boolean(art.featured),
     });
+    setTagInput(art.tags || '');
     setFormErrors({});
     setIsModalOpen(true);
   };
@@ -638,18 +697,82 @@ export function ArticleManagementSection() {
               </div>
 
               {/* Tags & Featured */}
-              <div>
+              <div className="relative">
                 <label className="block text-xs font-mono uppercase text-[#334155] mb-1">
-                  Etiquetas / Tags
+                  Etiquetas / Tags (escribe para buscar existentes o añadir nuevas)
                 </label>
                 <Input
                   data-testid="article-form-tags"
                   type="text"
-                  placeholder="separadas por coma (ej. expedición, historia, arqueología)"
-                  value={formData.tags || ''}
-                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                  placeholder="ej. expedición, historia, arqueología"
+                  value={tagInput}
+                  onChange={(e) => {
+                    setTagInput(e.target.value);
+                    setShowTagSuggestions(true);
+                    setFormData({ ...formData, tags: e.target.value });
+                  }}
+                  onFocus={() => setShowTagSuggestions(true)}
+                  onBlur={() => {
+                    setTimeout(() => setShowTagSuggestions(false), 200);
+                  }}
                   className="text-xs rounded-none"
                 />
+                {formData.tags && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {formData.tags
+                      .split(',')
+                      .map((t) => t.trim())
+                      .filter(Boolean)
+                      .map((t, idx) => (
+                        <span
+                          key={idx}
+                          className="bg-[#1B275E]/10 text-[#1B275E] text-[10px] font-mono px-2 py-0.5 flex items-center gap-1 border border-[#1B275E]/20"
+                        >
+                          {t}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = formData.tags
+                                ? formData.tags
+                                    .split(',')
+                                    .map((s) => s.trim())
+                                    .filter((s) => s.toLowerCase() !== t.toLowerCase())
+                                    .join(', ')
+                                : '';
+                              setFormData({ ...formData, tags: updated });
+                              setTagInput(updated);
+                            }}
+                            className="hover:text-rose-600 ml-0.5 cursor-pointer"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                  </div>
+                )}
+                {showTagSuggestions && filteredTagSuggestions.length > 0 && (
+                  <div className="absolute z-30 left-0 right-0 mt-1 bg-white border border-[#CBD5E1] shadow-xl max-h-44 overflow-y-auto">
+                    <div className="p-1.5 text-[10px] font-mono text-[#64748B] border-b border-[#E2E8F0] bg-[#F8FAFC]">
+                      Etiquetas existentes (haz clic para usar):
+                    </div>
+                    {filteredTagSuggestions.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          handleSelectTagSuggestion(tag);
+                        }}
+                        className="w-full text-left px-3 py-2 text-xs text-[#1B275E] hover:bg-[#E2E8F0] font-mono cursor-pointer flex items-center justify-between transition-colors"
+                      >
+                        <span className="font-medium">{tag}</span>
+                        <span className="text-[10px] text-[#9E731B] bg-[#D2A446]/10 px-1.5 py-0.5">
+                          Existente
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-2 pt-2">

@@ -24,6 +24,7 @@ describe('ManageMagazinesUseCase', () => {
       updateArticle: vi.fn(),
       deleteArticle: vi.fn(),
       getMagazineIssuesOptions: vi.fn(),
+      listTags: vi.fn(),
     };
     useCase = new ManageMagazinesUseCase(mockRepo);
   });

@@ -202,3 +202,15 @@ export async function deleteAdminArticleAction(
     return { success: false, error: message };
   }
 }
+
+export async function getAdminTagsAction(): Promise<ServerActionResponse<string[]>> {
+  try {
+    const data = await manageArticlesUseCase.getTags();
+    return { success: true, data };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Error al obtener etiquetas.';
+    console.error('getAdminTagsAction error:', error);
+    return { success: false, error: message };
+  }
+}
+

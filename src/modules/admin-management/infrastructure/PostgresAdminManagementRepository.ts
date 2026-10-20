@@ -1,6 +1,6 @@
 import { and, count, desc, eq, ilike, or } from 'drizzle-orm';
 import { db } from '@/src/db/index';
-import { articles, magazineIssues, magazines } from '@/src/db/schema';
+import { articles, magazineIssues, magazines, tags } from '@/src/db/schema';
 import {
   MagazineAdminDTO,
   MagazineInput,
@@ -386,7 +386,24 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
     };
   }
 
+  private async ensureTagsExist(tagsStr?: string | null): Promise<void> {
+    if (!tagsStr || !tagsStr.trim()) return;
+    const tagNames = tagsStr.split(',').map((t) => t.trim()).filter(Boolean);
+    for (const name of tagNames) {
+      try {
+        await db
+          .insert(tags)
+          .values({ name })
+          .onConflictDoNothing();
+      } catch (err) {
+        // ignore duplicate key or handle gracefully
+      }
+    }
+  }
+
   async createArticle(input: ArticleInput): Promise<ArticleAdminDTO> {
+    await this.ensureTagsExist(input.tags);
+
     const [inserted] = await db
       .insert(articles)
       .values({
@@ -411,6 +428,8 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
   }
 
   async updateArticle(id: number, input: ArticleInput): Promise<ArticleAdminDTO> {
+    await this.ensureTagsExist(input.tags);
+
     const [updated] = await db
       .update(articles)
       .set({
@@ -473,5 +492,12 @@ export class PostgresAdminManagementRepository implements IAdminManagementReposi
       month: r.month,
       label: `${r.magazineName} — Nº ${r.issueNumber} (${r.year}${r.month ? ` - ${r.month}` : ''})`,
     }));
+  }
+
+  // ===================== TAGS =====================
+
+  async listTags(): Promise<string[]> {
+    const rows = await db.select({ name: tags.name }).from(tags).orderBy(tags.name);
+    return rows.map((r) => r.name);
   }
 }
